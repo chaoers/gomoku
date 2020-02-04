@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backgammon", "backgammon.csproj", "{928F5B90-5FA2-4E07-91B1-615B0F45B130}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backgammon", "backgammon.csproj", "{24FD646C-3AE9-426E-93B2-98D49090B55D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{928F5B90-5FA2-4E07-91B1-615B0F45B130}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{928F5B90-5FA2-4E07-91B1-615B0F45B130}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{928F5B90-5FA2-4E07-91B1-615B0F45B130}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{928F5B90-5FA2-4E07-91B1-615B0F45B130}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24FD646C-3AE9-426E-93B2-98D49090B55D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24FD646C-3AE9-426E-93B2-98D49090B55D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24FD646C-3AE9-426E-93B2-98D49090B55D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24FD646C-3AE9-426E-93B2-98D49090B55D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9BC5CB2E-65C8-4A5B-8C0C-1FD0286C6EB7}
+		SolutionGuid = {BB11753C-8929-4DF9-9988-E5EBD3CE51DD}
 	EndGlobalSection
 EndGlobal
