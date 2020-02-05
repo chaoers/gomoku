@@ -7,11 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
     <Grid>
-        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="Button_Click" Background="{x:Null}" Height="39" Width="82"/>
-        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="Button_Click" Background="{x:Null}" Height="39" Width="82"/>
+        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="addBlack" Background="{x:Null}" Height="39" Width="82"/>
+        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="addWhite" Background="{x:Null}" Height="39" Width="82"/>
         <Grid HorizontalAlignment="Left" Height="600" Margin="27,95,0,0" VerticalAlignment="Top" Width="600
               ">
-            <Canvas x:Name="pan"/>
+            <Canvas x:Name="pan">
+            </Canvas>
             <Button x:Name="startButton" Content="构建棋盘" HorizontalAlignment="Center" Margin="0,266,0,0" VerticalAlignment="Top" Height="58" Width="104" Click="drawButton"
                     />
         </Grid>

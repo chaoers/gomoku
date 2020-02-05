@@ -7,5 +7,10 @@ namespace backgammon
 {
     class Piece : Image
     {
+        public Piece()
+        {
+            this.Width = 50;
+            this.Height = 50;
+        }
     }
 }

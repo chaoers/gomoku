@@ -27,9 +27,19 @@ namespace backgammon
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void addBlack(object sender, RoutedEventArgs e)
         {
-            this.StartDraw();
+            var black = new BlackPiece();
+            pan.Children.Add(black);
+            Canvas.SetLeft(black, 10);
+            Canvas.SetTop(black, 10);
+        }
+        private void addWhite(object sender, RoutedEventArgs e)
+        {
+            var white = new WhitePiece();
+            pan.Children.Add(white);
+            Canvas.SetLeft(white, 100);
+            Canvas.SetTop(white, 100);
         }
 
         private void StartDraw()
