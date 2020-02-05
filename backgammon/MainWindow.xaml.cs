@@ -23,6 +23,8 @@ namespace backgammon
         {
             InitializeComponent();
             logText.AppendText("初始化完成\n");
+
+            MouseDown += (s, e) => pan_MouseDown(s, e);
         }
 
         private void multiplayer(object sender, RoutedEventArgs e)
@@ -125,11 +127,12 @@ namespace backgammon
 
         private void pan_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var black = new BlackPiece();
-            pan.Children.Add(black);
-            Canvas.SetLeft(black, e.GetPosition(pan).X - 15);
-            Canvas.SetTop(black, e.GetPosition(pan).Y - 15);
-            logText.AppendText("添加黑棋\n");
+            if(e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570 
+                && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570)
+            {
+                var black = new BlackPiece();
+                this.addBlack(e.GetPosition(pan).X, e.GetPosition(pan).Y);
+            }
         }
     }
 }
