@@ -53,7 +53,7 @@ namespace backgammon
                 pan.Children.Add(path);
                 var animation = new PointAnimation(start, end, new Duration(TimeSpan.FromSeconds(3)))
                 {
-                    BeginTime = TimeSpan.FromMilliseconds(i * 200)
+                    BeginTime = TimeSpan.FromMilliseconds(i * 214)
                 };
                 storyboard.Children.Add(animation);
                 Storyboard.SetTargetName(animation, "line_0"+i);
@@ -84,6 +84,17 @@ namespace backgammon
                 Storyboard.SetTargetProperty(animation, new PropertyPath(LineGeometry.EndPointProperty));
             }
             storyboard.Begin(this);
+        }
+
+        private void StartDraw(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void drawButton(object sender, RoutedEventArgs e)
+        {
+            startButton.Visibility = Visibility.Collapsed;
+            this.StartDraw();
         }
     }
 }
