@@ -19,6 +19,7 @@ namespace backgammon
     public partial class MainWindow : Window
     {
         public static MainWindow mainWindow;
+        private static Board mainboard = new Board();
         public MainWindow()
         {
             InitializeComponent();
@@ -36,7 +37,7 @@ namespace backgammon
             logText.AppendText("切换为AI对战\n");
         }
 
-        private void addBlack(double X, double Y)
+        public void addBlack(int X, int Y)
         {
             var black = new BlackPiece();
             pan.Children.Add(black);
@@ -44,7 +45,7 @@ namespace backgammon
             Canvas.SetTop(black, Y-15);
             logText.AppendText("添加黑棋\n");
         }
-        private void addWhite(double X, double Y)
+        private void addWhite(int X, int Y)
         {
             var white = new WhitePiece();
             pan.Children.Add(white);
@@ -130,8 +131,11 @@ namespace backgammon
             if(e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570 
                 && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570)
             {
-                var black = new BlackPiece();
-                this.addBlack(e.GetPosition(pan).X, e.GetPosition(pan).Y);
+                int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
+                if(position[0] != -1) 
+                { 
+                    addBlack(position[0]*40+10, position[1]*40+10);
+                }
             }
         }
     }
