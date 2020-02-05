@@ -7,16 +7,16 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
     <Grid>
-        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="addBlack" Background="{x:Null}" Height="39" Width="82"/>
-        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="addWhite" Background="{x:Null}" Height="39" Width="82"/>
+        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="multiplayer" Background="{x:Null}" Height="39" Width="82"/>
+        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="singleplayer" Background="{x:Null}" Height="39" Width="82"/>
         <Grid HorizontalAlignment="Left" Height="600" Margin="27,95,0,0" VerticalAlignment="Top" Width="600
               ">
-            <Canvas x:Name="pan">
+            <Canvas x:Name="pan" MouseDown="pan_MouseDown">
             </Canvas>
             <Button x:Name="startButton" Content="构建棋盘" HorizontalAlignment="Center" Margin="0,266,0,0" VerticalAlignment="Top" Height="58" Width="104" Click="drawButton"
                     />
         </Grid>
-        <TextBox HorizontalAlignment="Left" Margin="721,95,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="435" Height="365" OverridesDefaultStyle="True" IsReadOnlyCaretVisible="True"/>
+        <TextBox x:Name="logText" HorizontalAlignment="Left" Height="264" Margin="709,131,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="432" IsReadOnly="True"/>
 
     </Grid>
 </Window>

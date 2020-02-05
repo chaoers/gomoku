@@ -5,12 +5,12 @@ using System.Windows.Controls;
 
 namespace backgammon
 {
-    class Piece : Image
+    abstract class Piece : Image
     {
         public Piece()
         {
-            this.Width = 50;
-            this.Height = 50;
+            this.Width = 30;
+            this.Height = 30;
         }
     }
 }

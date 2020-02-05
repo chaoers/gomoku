@@ -16,34 +16,44 @@ using System.Windows.Media.Animation;
 
 namespace backgammon
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public static MainWindow mainWindow;
         public MainWindow()
         {
             InitializeComponent();
+            logText.AppendText("初始化完成\n");
         }
 
-        private void addBlack(object sender, RoutedEventArgs e)
+        private void multiplayer(object sender, RoutedEventArgs e)
+        {
+            logText.AppendText("切换为玩家对战\n");
+        }
+        private void singleplayer(object sender, RoutedEventArgs e)
+        {
+            logText.AppendText("切换为AI对战\n");
+        }
+
+        private void addBlack(double X, double Y)
         {
             var black = new BlackPiece();
             pan.Children.Add(black);
-            Canvas.SetLeft(black, 10);
-            Canvas.SetTop(black, 10);
+            Canvas.SetLeft(black, X-15);
+            Canvas.SetTop(black, Y-15);
+            logText.AppendText("添加黑棋\n");
         }
-        private void addWhite(object sender, RoutedEventArgs e)
+        private void addWhite(double X, double Y)
         {
             var white = new WhitePiece();
             pan.Children.Add(white);
-            Canvas.SetLeft(white, 100);
-            Canvas.SetTop(white, 100);
+            Canvas.SetLeft(white, X-15);
+            Canvas.SetTop(white, Y-15);
+            logText.AppendText("添加白棋\n");
         }
 
-        private void StartDraw()
+        private void startDraw()
         {
+            logText.AppendText("开始构建棋盘\n");
             var storyboard = new Storyboard();
             for (int i = 0; i < 15; i++)
             {
@@ -93,13 +103,33 @@ namespace backgammon
                 Storyboard.SetTargetName(animation, "line_1" + i);
                 Storyboard.SetTargetProperty(animation, new PropertyPath(LineGeometry.EndPointProperty));
             }
+            storyboard.Completed += finishDraw;
             storyboard.Begin(this);
+        }
+
+        private void finishDraw(object sender, EventArgs eventArgs)
+        {
+            logText.AppendText("构建棋盘完成\n");
         }
 
         private void drawButton(object sender, RoutedEventArgs e)
         {
             startButton.Visibility = Visibility.Collapsed;
-            this.StartDraw();
+            this.startDraw();
+        }
+
+        private void logText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void pan_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var black = new BlackPiece();
+            pan.Children.Add(black);
+            Canvas.SetLeft(black, e.GetPosition(pan).X - 15);
+            Canvas.SetTop(black, e.GetPosition(pan).Y - 15);
+            logText.AppendText("添加黑棋\n");
         }
     }
 }
