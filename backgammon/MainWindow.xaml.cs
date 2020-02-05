@@ -86,11 +86,6 @@ namespace backgammon
             storyboard.Begin(this);
         }
 
-        private void StartDraw(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void drawButton(object sender, RoutedEventArgs e)
         {
             startButton.Visibility = Visibility.Collapsed;

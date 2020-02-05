@@ -15,6 +15,7 @@
             <Button x:Name="startButton" Content="构建棋盘" HorizontalAlignment="Center" Margin="0,266,0,0" VerticalAlignment="Top" Height="58" Width="104" Click="drawButton"
                     />
         </Grid>
+        <TextBox HorizontalAlignment="Left" Margin="721,95,0,0" Text="TextBox" TextWrapping="Wrap" VerticalAlignment="Top" Width="435" Height="365" OverridesDefaultStyle="True" IsReadOnlyCaretVisible="True"/>
 
     </Grid>
 </Window>
