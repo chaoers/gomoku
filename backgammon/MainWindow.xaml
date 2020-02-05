@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:backgammon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="800" Width="1200">
     <Grid>
         <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="Button_Click" Background="{x:Null}" Height="39" Width="82"/>
         <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="Button_Click" Background="{x:Null}" Height="39" Width="82"/>
-        <Grid HorizontalAlignment="Left" Height="302" Margin="27,95,0,0" VerticalAlignment="Top" Width="341">
+        <Grid HorizontalAlignment="Left" Height="600" Margin="27,95,0,0" VerticalAlignment="Top" Width="600
+              ">
             <Canvas x:Name="pan"/>
         </Grid>
 
