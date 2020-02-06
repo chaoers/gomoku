@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:backgammon"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1200">
-    <Grid MouseDown="pan_MouseDown">
+    <Grid MouseDown="pan_MouseDown" MouseMove="Grid_MouseMove">
         <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="multiplayer" Background="{x:Null}" Height="39" Width="82"/>
         <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="singleplayer" Background="{x:Null}" Height="39" Width="82"/>
         <Grid HorizontalAlignment="Left" Height="600" Margin="27,95,0,0" VerticalAlignment="Top" Width="600

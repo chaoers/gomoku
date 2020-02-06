@@ -138,5 +138,22 @@ namespace backgammon
                 }
             }
         }
+
+        private void Grid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570
+                && e.GetPosition(pan).Y >= 0 && e.GetPosition(pan).Y <= 570)
+            {
+                int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
+                if (position[0] != -1)
+                {
+                    this.Cursor = Cursors.Hand;
+                }
+                else
+                {
+                    this.Cursor = Cursors.Arrow;
+                }
+            }
+        }
     }
 }
