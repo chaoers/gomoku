@@ -6,6 +6,8 @@ namespace backgammon
 {
     class Board
     {
+        public int[,] pieceNum = new int[15, 15];
+        // 0-没有棋子 1-有黑棋 2-有白棋
         private static readonly int DISTANCE = 40;
         private static readonly int RADIUS = 5;
 
@@ -14,7 +16,7 @@ namespace backgammon
             var position = new int[2];
             position[0] = closeNode(x+30);
             position[1] = closeNode(y+30);
-            if(position[0] != -1 && position[1] != -1)
+            if(position[0] != -1 && position[1] != -1 && pieceNum[position[0],position[1]] == 0)
             {
                 return position;
             }

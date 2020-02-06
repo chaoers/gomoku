@@ -18,14 +18,17 @@ namespace backgammon
 {
     public partial class MainWindow : Window
     {
+        public bool color = true;
+        // 1-黑 0-白
         public static MainWindow mainWindow;
         private static Board mainboard = new Board();
         public MainWindow()
         {
             InitializeComponent();
-            logText.AppendText("初始化完成\n");
+    
+            MouseDown += (s, e) => pan_MouseDown(s, e); // 监听鼠标移动
 
-            MouseDown += (s, e) => pan_MouseDown(s, e);
+            logText.AppendText("初始化完成\n");
         }
 
         private void multiplayer(object sender, RoutedEventArgs e)
@@ -37,21 +40,23 @@ namespace backgammon
             logText.AppendText("切换为AI对战\n");
         }
 
-        public void addBlack(int X, int Y)
+        private BlackPiece addBlack(int X, int Y)
         {
             var black = new BlackPiece();
             pan.Children.Add(black);
             Canvas.SetLeft(black, X-15);
             Canvas.SetTop(black, Y-15);
             logText.AppendText("添加黑棋\n");
+            return black;
         }
-        private void addWhite(int X, int Y)
+        private WhitePiece addWhite(int X, int Y)
         {
             var white = new WhitePiece();
             pan.Children.Add(white);
             Canvas.SetLeft(white, X-15);
             Canvas.SetTop(white, Y-15);
             logText.AppendText("添加白棋\n");
+            return white;
         }
 
         private void startDraw()
@@ -133,8 +138,8 @@ namespace backgammon
             {
                 int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
                 if(position[0] != -1) 
-                { 
-                    addBlack(position[0]*40+10, position[1]*40+10);
+                {
+                    downPiece(position[0], position[1]);
                 }
             }
         }
@@ -153,6 +158,22 @@ namespace backgammon
                 {
                     this.Cursor = Cursors.Arrow;
                 }
+            }
+        }
+
+        private void downPiece(int X,int Y)
+        {
+            if(color == true)
+            {
+                mainboard.pieceNum[X, Y] = 1;
+                addBlack(X * 40 + 10, Y * 40 + 10);
+                color = false;
+            }
+            else
+            {
+                mainboard.pieceNum[X, Y] = 2;
+                addWhite(X * 40 + 10, Y * 40 + 10);
+                color = true;
             }
         }
     }
