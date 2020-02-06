@@ -11,6 +11,10 @@ namespace backgammon
         private static readonly int DISTANCE = 40;
         private static readonly int RADIUS = 5;
 
+        public void clearPiece()
+        {
+            pieceNum = new int[15, 15];
+        }
         public int[] placePosition(double x, double y)
         {
             var position = new int[2];

@@ -18,6 +18,7 @@ namespace backgammon
 {
     public partial class MainWindow : Window
     {
+        private bool isWinBool = true;
         public static MainWindow mainWindow;
         public bool color = true;
         // 1-黑 0-白
@@ -27,6 +28,7 @@ namespace backgammon
             InitializeComponent();
     
             MouseDown += (s, e) => pan_MouseDown(s, e); // 监听鼠标移动
+            addButton();
 
             logText.AppendText("初始化完成\n");
         }
@@ -113,49 +115,39 @@ namespace backgammon
             }
             storyboard.Completed += finishDraw;
             storyboard.Begin(this);
-        }
-        private void restartDraw()
-        {
             for (int i = 0; i < 15; i++)
             {
-                var start = new Point(10 + i * 40, 10);
-                var end = new Point(10 + i * 40, 570);
-                var line = new LineGeometry(start, end);
-                var path = new Path()
-                {
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 2,
-                    Data = line
-                };
-
-                pan.Children.Add(path);
+                pan.UnregisterName("line_0" + i);
+                pan.UnregisterName("line_1" + i);
             }
-            for (int i = 0; i < 15; i++)
-            {
-                var start = new Point(10, 10 + i * 40);
-                var end = new Point(570, 10 + i * 40);
-
-                var line = new LineGeometry(start, end);
-
-                var path = new Path()
-                {
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 2,
-                    Data = line
-                };
-                pan.Children.Add(path);
-            }
-            logText.AppendText("清空棋盘\n");
         }
-
         private void finishDraw(object sender, EventArgs eventArgs)
         {
             logText.AppendText("构建棋盘完成\n");
+            isWinBool = false;
+        }
+        private void addButton()
+        {
+            Button btn = new Button()
+            {
+                Name = "startButton",
+                Content = "构建棋盘",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(266, 266, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top,
+                Height = 58,
+                Width = 104,
+            };
+            btn.Click += new RoutedEventHandler(drawButton);
+            pan.Children.Add(btn);
+            pan.RegisterName("drawButton", btn);
         }
 
         private void drawButton(object sender, RoutedEventArgs e)
         {
-            startButton.Visibility = Visibility.Collapsed;
+            pan.Children.Clear();
+            Button btn = pan.FindName("drawButton") as Button;
+            pan.UnregisterName("drawButton");
             this.startDraw();
         }
 
@@ -167,7 +159,7 @@ namespace backgammon
         private void pan_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if(e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570 
-                && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570)
+                && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570 && isWinBool == false)
             {
                 int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
                 if(position[0] != -1) 
@@ -180,7 +172,7 @@ namespace backgammon
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570
-                && e.GetPosition(pan).Y >= 0 && e.GetPosition(pan).Y <= 570)
+                && e.GetPosition(pan).Y >= 0 && e.GetPosition(pan).Y <= 570 && isWinBool == false)
             {
                 int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
                 if (position[0] != -1)
@@ -191,6 +183,10 @@ namespace backgammon
                 {
                     this.Cursor = Cursors.Arrow;
                 }
+            }
+            else
+            {
+                this.Cursor = Cursors.Arrow;
             }
         }
 
@@ -203,11 +199,16 @@ namespace backgammon
                 var win = isWin(X, Y);
                 if(win == true)
                 {
-                    pan.Children.Clear();
-                    restartDraw();
+                    logText.AppendText("游戏结束，黑棋胜利\n");
+                    mainboard.clearPiece();
+                    addButton();
+                    isWinBool = true;
+                    color = true;
                 }
-                
-                color = false;
+                else
+                {
+                    color = false;
+                }
             }
             else
             {
@@ -216,9 +217,16 @@ namespace backgammon
                 var win = isWin(X, Y);
                 if (win == true)
                 {
-                    pan.Children.Clear();
+                    logText.AppendText("游戏结束，白棋胜利\n");
+                    mainboard.clearPiece();
+                    addButton();
+                    isWinBool = true;
+                    color = true;
                 }
-                color = true;
+                else
+                {
+                    color = true;
+                }
             }
         }
 
