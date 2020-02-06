@@ -114,6 +114,39 @@ namespace backgammon
             storyboard.Completed += finishDraw;
             storyboard.Begin(this);
         }
+        private void restartDraw()
+        {
+            for (int i = 0; i < 15; i++)
+            {
+                var start = new Point(10 + i * 40, 10);
+                var end = new Point(10 + i * 40, 570);
+                var line = new LineGeometry(start, end);
+                var path = new Path()
+                {
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 2,
+                    Data = line
+                };
+
+                pan.Children.Add(path);
+            }
+            for (int i = 0; i < 15; i++)
+            {
+                var start = new Point(10, 10 + i * 40);
+                var end = new Point(570, 10 + i * 40);
+
+                var line = new LineGeometry(start, end);
+
+                var path = new Path()
+                {
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 2,
+                    Data = line
+                };
+                pan.Children.Add(path);
+            }
+            logText.AppendText("清空棋盘\n");
+        }
 
         private void finishDraw(object sender, EventArgs eventArgs)
         {
@@ -167,14 +200,24 @@ namespace backgammon
             {
                 mainboard.pieceNum[X, Y] = 1;
                 addBlack(X * 40 + 10, Y * 40 + 10);
-                logText.AppendText(isWin(X, Y) ? "1\n": "0\n") ;
+                var win = isWin(X, Y);
+                if(win == true)
+                {
+                    pan.Children.Clear();
+                    restartDraw();
+                }
+                
                 color = false;
             }
             else
             {
                 mainboard.pieceNum[X, Y] = 2;
                 addWhite(X * 40 + 10, Y * 40 + 10);
-                logText.AppendText(isWin(X, Y) ? "1\n" : "0\n");
+                var win = isWin(X, Y);
+                if (win == true)
+                {
+                    pan.Children.Clear();
+                }
                 color = true;
             }
         }
@@ -205,6 +248,7 @@ namespace backgammon
             {
                 return true;
             }
+            // 竖向查找
             var top = 0;
             for (int i = Y; i >= 0; i--)
             {
@@ -227,6 +271,7 @@ namespace backgammon
             {
                 return true;
             }
+            // 左上到右下查找
             var left_top = 0;
             for (int [] i = {X,Y}; i[0]>=0&&i[1] >= 0; i[0]--,i[1]--)
             {
@@ -249,6 +294,7 @@ namespace backgammon
             {
                 return true;
             }
+            // 右上到左下查找
             var right_top = 0;
             for (int[] i = { X, Y }; i[0] < 15 && i[1] >= 0; i[0]++, i[1]--)
             {
