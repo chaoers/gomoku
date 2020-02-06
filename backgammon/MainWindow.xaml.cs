@@ -18,9 +18,9 @@ namespace backgammon
 {
     public partial class MainWindow : Window
     {
+        public static MainWindow mainWindow;
         public bool color = true;
         // 1-黑 0-白
-        public static MainWindow mainWindow;
         private static Board mainboard = new Board();
         public MainWindow()
         {
@@ -167,14 +167,111 @@ namespace backgammon
             {
                 mainboard.pieceNum[X, Y] = 1;
                 addBlack(X * 40 + 10, Y * 40 + 10);
+                logText.AppendText(isWin(X, Y) ? "1\n": "0\n") ;
                 color = false;
             }
             else
             {
                 mainboard.pieceNum[X, Y] = 2;
                 addWhite(X * 40 + 10, Y * 40 + 10);
+                logText.AppendText(isWin(X, Y) ? "1\n" : "0\n");
                 color = true;
             }
+        }
+
+        private bool isWin(int X,int Y)
+        {
+            var Z = color == true ? 1 : 2;
+            // 横向查找
+            var left = 0;
+            for(int i = X;i >= 0; i--)
+            {
+                if(mainboard.pieceNum[i,Y] != Z)
+                {
+                    break;
+                }
+                left++;
+            }
+            var right = 0;
+            for (int i = X; i < 15; i++)
+            {
+                if (mainboard.pieceNum[i, Y] != Z)
+                {
+                    break;
+                }
+                right++;
+            }
+            if(left + right > 5)
+            {
+                return true;
+            }
+            var top = 0;
+            for (int i = Y; i >= 0; i--)
+            {
+                if (mainboard.pieceNum[X, i] != Z)
+                {
+                    break;
+                }
+                top++;
+            }
+            var bottom = 0;
+            for (int i = Y; i < 15; i++)
+            {
+                if (mainboard.pieceNum[X, i] != Z)
+                {
+                    break;
+                }
+                bottom++;
+            }
+            if(top + bottom > 5)
+            {
+                return true;
+            }
+            var left_top = 0;
+            for (int [] i = {X,Y}; i[0]>=0&&i[1] >= 0; i[0]--,i[1]--)
+            {
+                if (mainboard.pieceNum[i[0], i[1]] != Z)
+                {
+                    break;
+                }
+                left_top++;
+            }
+            var right_bottom = 0;
+            for (int[] i = { X, Y }; i[0] < 15 && i[1] <= 15; i[0]++, i[1]++)
+            {
+                if (mainboard.pieceNum[i[0], i[1]] != Z)
+                {
+                    break;
+                }
+                right_bottom++;
+            }
+            if (left_top + right_bottom > 5)
+            {
+                return true;
+            }
+            var right_top = 0;
+            for (int[] i = { X, Y }; i[0] < 15 && i[1] >= 0; i[0]++, i[1]--)
+            {
+                if (mainboard.pieceNum[i[0], i[1]] != Z)
+                {
+                    break;
+                }
+                right_top++;
+            }
+            var left_bottom = 0;
+            for (int[] i = { X, Y }; i[0] >= 0 && i[1] < 15; i[0]--, i[1]++)
+            {
+                if (mainboard.pieceNum[i[0], i[1]] != Z)
+                {
+                    break;
+                }
+                left_bottom++;
+            }
+            if (right_top + left_bottom > 5)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
