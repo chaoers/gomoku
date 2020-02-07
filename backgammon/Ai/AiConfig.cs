@@ -16,5 +16,11 @@ namespace backgammon
         public bool star = true; // 是否开启 starspread
         public bool cache = true; // 使用缓存, 其实只有搜索的缓存有用，其他缓存几乎无用。因为只有搜索的缓存命中后就能剪掉一整个分支，这个分支一般会包含很多个点。而在其他地方加缓存，每次命中只能剪掉一个点，影响不大。
         public bool window = false; // 启用期望窗口，由于用的模糊比较，所以和期望窗口是有冲突的
+
+        public enum player {
+            hum = 1,
+            com = 2,
+            empty = 0
+        }
     }
 }
