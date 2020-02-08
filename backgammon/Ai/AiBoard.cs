@@ -37,11 +37,58 @@ namespace backgammon
         private int count = 0;
         private int total = 0;
 
+        // scoreCache[role][dir][row,column]
+        private int[][][,] scoreCache = new int[3][][,] {new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]},new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]},new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]}};
+
+        // 储存双方得分
+        private int[,] comScore = new int[15,15];
+        private int[,] humScore = new int[15,15];
+
         // 传入棋子矩阵和位数
         public AiBoard(int[,] _board, int size)
         {
             board = _board;
             statistic.init(size);
+        }
+
+        private void initScore()
+        {
+            for (int i = 0; i < 15; i++)
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if(board[i,j] == (int)AiConfig.player.empty)
+                    {
+                        
+                    }
+                }
+            }
+        }
+
+        private bool hasNeighbor(int x, int y, int distance, int count)
+        {
+            var startX = x-distance;
+            var endX = x+distance;
+            var startY = y-distance;
+            var endY = y+distance;
+            for (int i = startX; i < endX; i++)
+            {
+                if(i<0 || i>=15) continue;
+                for (int j = startY; j < endY; j++)
+                {
+                    if(j<0 || j>=15) continue;
+                    if(i == x && j == y) continue;
+                    if(board[i,j] != (int)AiConfig.player.empty)
+                    {
+                        count--;
+                        if(count <= 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public int[] gen(int role)
