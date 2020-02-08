@@ -49,6 +49,7 @@ namespace backgammon
         {
             board = _board;
             statistic.init(size);
+            initScore();
         }
 
         private void initScore()
@@ -59,19 +60,23 @@ namespace backgammon
                 {
                     if (board[i, j] == (int)AiConfig.player.empty)
                     {
-                        if (hasNeighbor(i, j, 2, 2))
+                        if (hasNeighbor(i, j, 2, 2)) //必须是有邻居的才行
                         {
                             var cs = scorePoint(i, j, (int)AiConfig.player.com, -1);
                             var hs = scorePoint(i, j, (int)AiConfig.player.hum, -1);
-                            comScore[i,j] = cs;
-                            humScore[i,j] = hs;
+                            comScore[i, j] = cs;
+                            humScore[i, j] = hs;
                         }
-                    }else if(board[i, j] == (int)AiConfig.player.com){
+                    }
+                    else if (board[i, j] == (int)AiConfig.player.com) // 对电脑打分，玩家此位置分数为0
+                    {
                         comScore[i, j] = scorePoint(i, j, (int)AiConfig.player.com, -1);
                         humScore[i, j] = 0;
-                    }else if(board[i, j] == (int)AiConfig.player.hum){
+                    }
+                    else if (board[i, j] == (int)AiConfig.player.hum) // 对玩家打分，电脑位置分数为0
+                    {
                         humScore[i, j] = scorePoint(i, j, (int)AiConfig.player.hum, -1);
-                        comScore[i ,j] = 0;
+                        comScore[i, j] = 0;
                     }
                 }
             }
@@ -362,7 +367,7 @@ namespace backgammon
                 {
                     var x = px + i;
                     var y = py - i;
-                    if (x<0||y<0||x >= 15 || y >= 15)
+                    if (x < 0 || y < 0 || x >= 15 || y >= 15)
                     {
                         block++;
                         break;
@@ -396,7 +401,7 @@ namespace backgammon
                 {
                     var x = px - i;
                     var y = py + i;
-                    if (x < 0 || y < 0 || x>=15 || y>=15)
+                    if (x < 0 || y < 0 || x >= 15 || y >= 15)
                     {
                         block++;
                         break;
