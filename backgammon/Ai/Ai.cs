@@ -6,8 +6,6 @@ namespace backgammon
 {
     class Ai
     {
-        public static AiConfig aiConfig = new AiConfig();
-        
         public static AiBoard aiBoard = new AiBoard();
         public AiOpening aiOpening = new AiOpening();
 

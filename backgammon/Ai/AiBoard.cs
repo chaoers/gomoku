@@ -38,11 +38,11 @@ namespace backgammon
         private int total = 0;
 
         // scoreCache[role][dir][row,column]
-        private int[][][,] scoreCache = new int[3][][,] {new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]},new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]},new int[4][,]{new int[15,15],new int[15,15],new int[15,15],new int[15,15]}};
+        private int[][][,] scoreCache = new int[3][][,] { new int[4][,] { new int[15, 15], new int[15, 15], new int[15, 15], new int[15, 15] }, new int[4][,] { new int[15, 15], new int[15, 15], new int[15, 15], new int[15, 15] }, new int[4][,] { new int[15, 15], new int[15, 15], new int[15, 15], new int[15, 15] } };
 
         // 储存双方得分
-        private int[,] comScore = new int[15,15];
-        private int[,] humScore = new int[15,15];
+        private int[,] comScore = new int[15, 15];
+        private int[,] humScore = new int[15, 15];
 
         // 传入棋子矩阵和位数
         public AiBoard(int[,] _board, int size)
@@ -57,9 +57,12 @@ namespace backgammon
             {
                 for (int j = 0; j < 15; j++)
                 {
-                    if(board[i,j] == (int)AiConfig.player.empty)
+                    if (board[i, j] == (int)AiConfig.player.empty)
                     {
-                        
+                        if (hasNeighbor(i, j, 2, 2))
+                        {
+
+                        }
                     }
                 }
             }
@@ -67,21 +70,21 @@ namespace backgammon
 
         private bool hasNeighbor(int x, int y, int distance, int count)
         {
-            var startX = x-distance;
-            var endX = x+distance;
-            var startY = y-distance;
-            var endY = y+distance;
+            var startX = x - distance;
+            var endX = x + distance;
+            var startY = y - distance;
+            var endY = y + distance;
             for (int i = startX; i < endX; i++)
             {
-                if(i<0 || i>=15) continue;
+                if (i < 0 || i >= 15) continue;
                 for (int j = startY; j < endY; j++)
                 {
-                    if(j<0 || j>=15) continue;
-                    if(i == x && j == y) continue;
-                    if(board[i,j] != (int)AiConfig.player.empty)
+                    if (j < 0 || j >= 15) continue;
+                    if (i == x && j == y) continue;
+                    if (board[i, j] != (int)AiConfig.player.empty)
                     {
                         count--;
-                        if(count <= 0)
+                        if (count <= 0)
                         {
                             return true;
                         }
@@ -91,6 +94,268 @@ namespace backgammon
             return false;
         }
 
+        /*
+        * 启发式评价函数
+        * 这个是专门给某一个位置打分的，不是给整个棋盘打分的
+        * 并且是只给某一个角色打分
+        */
+        private int scorePoint(int b, int px, int py, int role, int dir)
+        /*
+        * 表示在当前位置下一个棋子后的分数
+        * 为了性能考虑，增加了一个dir参数，如果没有传入则默认计算所有四个方向，如果传入值，则只计算其中一个方向的值
+        */
+        {
+            var result = 0;
+            // var radius = 8;
+            var empty = 0;
+            var count = 0;
+            var block = 0;
+            var secondCount = 0;
+
+            void reset()
+            {
+                count = 1;
+                block = 0;
+                empty = -1;
+                secondCount = 0;
+            }
+
+            if (dir == 0)
+            {
+                reset();
+                for (int i = py + 1; true; i++)
+                {
+                    if (i >= 15)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[px, i];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && i < 15 - 1 && board[px, i + 1] == role)
+                        {
+                            empty = count;
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        count++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                for (int i = py - 1; true; i--)
+                {
+                    if (i < 0)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[px, i];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && i > 0 && board[px, i - 1] == role)
+                        {
+                            empty = 0;  //注意这里是0，因为是从右往左走的
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        secondCount++;
+                        if (empty != -1) empty++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                count += secondCount;
+
+                scoreCache[role][0][px, py] = countToScore(count, block, empty);
+            }
+            result += scoreCache[role][3][px,py];
+
+            return result;
+        }
+
+        private int countToScore(int count, int block, int empty)
+        {
+            if (empty <= 0)
+            {
+                if (count >= 5) return (int)AiConfig.score.five;
+                if (block == 0)
+                {
+                    switch (count)
+                    {
+                        case 1: return (int)AiConfig.score.one;
+                        case 2: return (int)AiConfig.score.two;
+                        case 3: return (int)AiConfig.score.three;
+                        case 4: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 1: return (int)AiConfig.score.block_one;
+                        case 2: return (int)AiConfig.score.block_two;
+                        case 3: return (int)AiConfig.score.block_three;
+                        case 4: return (int)AiConfig.score.block_four;
+                    }
+                }
+            }
+            else if (empty == 1 || empty == count - 1)
+            {
+                if (count >= 6) return (int)AiConfig.score.five;
+                if (block == 0)
+                {
+                    switch (count)
+                    {
+                        case 2: return (int)AiConfig.score.two / 2;
+                        case 3: return (int)AiConfig.score.three;
+                        case 4: return (int)AiConfig.score.block_four;
+                        case 5: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 2: return (int)AiConfig.score.block_two;
+                        case 3: return (int)AiConfig.score.block_three;
+                        case 4: return (int)AiConfig.score.block_four;
+                        case 5: return (int)AiConfig.score.block_four;
+                    }
+                }
+            }
+            else if (empty == 2 || empty == count - 2)
+            {
+                if (count >= 7) return (int)AiConfig.score.five;
+                if (block == 0)
+                {
+                    switch (count)
+                    {
+                        case 3: return (int)AiConfig.score.three;
+                        case 4:
+                        case 5: return (int)AiConfig.score.block_four;
+                        case 6: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 3: return (int)AiConfig.score.block_three;
+                        case 4: return (int)AiConfig.score.block_four;
+                        case 5: return (int)AiConfig.score.block_four;
+                        case 6: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 2)
+                {
+                    switch (count)
+                    {
+                        case 4:
+                        case 5:
+                        case 6: return (int)AiConfig.score.block_four;
+                    }
+                }
+            }
+            else if (empty == 3 || empty == count - 3)
+            {
+                if (count >= 8) return (int)AiConfig.score.five;
+                if (block == 0)
+                {
+                    switch (count)
+                    {
+                        case 4:
+                        case 5: return (int)AiConfig.score.three;
+                        case 6: return (int)AiConfig.score.block_four;
+                        case 7: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 4:
+                        case 5:
+                        case 6: return (int)AiConfig.score.block_four;
+                        case 7: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7: return (int)AiConfig.score.block_four;
+                    }
+                }
+            }
+            else if (empty == 4 || empty == count - 4)
+            {
+                if (count >= 9) return (int)AiConfig.score.five;
+                if (block == 0)
+                {
+                    switch (count)
+                    {
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 1)
+                {
+                    switch (count)
+                    {
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7: return (int)AiConfig.score.block_four;
+                        case 8: return (int)AiConfig.score.four;
+                    }
+                }
+                if (block == 2)
+                {
+                    switch (count)
+                    {
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8: return (int)AiConfig.score.block_four;
+                    }
+                }
+            }
+            else if (empty == 4 || empty == count - 4)
+            {
+                return (int)AiConfig.score.five;
+            }
+
+            return 0;
+        }
         public int[] gen(int role)
         {
             if (count <= 0)
