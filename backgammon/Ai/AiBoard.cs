@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace backgammon
 {
@@ -15,9 +16,17 @@ namespace backgammon
             }
         }
 
-        class Step
+        class Point
         {
-            private int role;
+            public Point(int x, int y)
+            {
+                p = new int[] { x, y };
+            }
+            public int[] p;
+            public int scoreHum = 0;
+            public int scoreCom = 0;
+            public int score = 0;
+            public int role = 0;
         }
         // class Zobrist
         // {
@@ -32,8 +41,8 @@ namespace backgammon
 
         private AiStatistic statistic = new AiStatistic();
         private int[,] board = new int[15, 15];
-        private Step[] currentSteps = new Step[0];
-        private Step[] allSteps = new Step[0];
+        private Point[] currentSteps = new Point[0];
+        private Point[] allSteps = new Point[0];
         private int count = 0;
         private int total = 0;
 
@@ -600,36 +609,59 @@ namespace backgammon
 
             return 0;
         }
-        public int[] gen(int role)
+        private bool starTo(Point point, Point[] points)
+        {
+            if (points.Length == 0)
+            {
+                return false;
+            }
+            var a = point;
+            for (int i = 0; i < points.Length; i++)
+            {
+                var b = points[i];
+                // 距离必须在5步以内
+                if (Math.Abs(a.p[0] - b.p[0]) > 4 || Math.Abs(a.p[0] - b.p[0]) > 4)
+                {
+                    return false;
+                }
+                // 必须在米子方向上
+                if (!(a.p[0] == b.p[0] || a.p[1] == b.p[1] || (Math.Abs(a.p[0] - b.p[0]) == Math.Abs(a.p[0] - b.p[0]))))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public List<Point> gen(int role, bool onlyThrees, bool starspread)
         {
             if (count <= 0)
             {
-                return new int[] { 7, 7 };
+                return new List<Point> { new Point(7, 7) };
             }
-            int[] fives;
-            int[] comfours;
-            int[] humfours;
-            int[] comblockedfours;
-            int[] humblockedfours;
-            int[] comtwothrees;
-            int[] humtwothrees;
-            int[] comthrees;
-            int[] humthrees;
-            int[] comtwos;
-            int[] humtwos;
-            int[] neighbors;
+            List<Point> fives = new List<Point>();
+            List<Point> comfours = new List<Point>();
+            List<Point> humfours = new List<Point>();
+            List<Point> comblockedfours = new List<Point>();
+            List<Point> humblockedfours = new List<Point>();
+            List<Point> comtwothrees = new List<Point>();
+            List<Point> humtwothrees = new List<Point>();
+            List<Point> comthrees = new List<Point>();
+            List<Point> humthrees = new List<Point>();
+            List<Point> comtwos = new List<Point>();
+            List<Point> humtwos = new List<Point>();
+            List<Point> neighbors = new List<Point>();
 
             var reverseRole = role == 1 ? 2 : 1;
             // 找到双方的最后进攻点
-            int[] attackPoints;
-            int[] defendPoints;
+            Point[] attackPoints = new Point[0];
+            Point[] defendPoints = new Point[0];
 
             // 默认情况下 我们遍历整个棋盘。但是在开启star模式下，我们遍历的范围就会小很多
             // 只需要遍历以两个点为中心正方形。
             // 注意除非专门处理重叠区域，否则不要把两个正方形分开算，因为一般情况下这两个正方形会有相当大的重叠面积，别重复计算了
             if (AiConfig.starspread)
             {
-                // var i = this.currentSteps.length - 1
+                var i = currentSteps.Length - 1;
                 // while(i >= 0) {
                 //   var p = this.currentSteps[i]
                 //   if (reverseRole === R.com && p.scoreCom >= S.THREE
@@ -640,7 +672,7 @@ namespace backgammon
                 //   i -= 2
                 // }
 
-                // var i = this.currentSteps.length - 2
+                // var i = currentSteps.Length - 2;
                 // while(i >= 0) {
                 //   var p = this.currentSteps[i]
                 //   if (role === R.com && p.scoreCom >= S.THREE
@@ -658,12 +690,195 @@ namespace backgammon
                 {
                     // defendPoints.push(this.currentSteps[0].role === reverseRole? this.currentSteps[0] : this.currentSteps[1])
                 }
-
-                for (int i = 0; i < board.Length; i++)
+            }
+            for (int i = 0; i < 15; i++)
+            {
+                for (int j = 0; j < 15; j++)
                 {
+                    if (board[i, j] == (int)AiConfig.player.empty)
+                    {
 
+                        if (allSteps.Length < 6)
+                        {
+                            if (!hasNeighbor(i, j, 1, 1))
+                            {
+                                continue;
+                            }
+                        }
+                        else if (!hasNeighbor(i, j, 2, 2))
+                        {
+                            continue;
+                        }
+
+                        var scoreHum = humScore[i, j];
+                        var scoreCom = comScore[i, j];
+                        var maxScore = Math.Max(scoreHum, scoreCom);
+
+                        if (onlyThrees && maxScore < (int)AiConfig.score.three)
+                        {
+                            continue;
+                        }
+
+                        var p = new Point(i, j);
+                        p.scoreCom = scoreCom;
+                        p.scoreCom = scoreCom;
+                        p.score = maxScore;
+                        p.role = role;
+
+                        total++;
+
+                        /* 双星延伸，以提升性能
+                        * 思路：每次下的子，只可能是自己进攻，或者防守对面（也就是对面进攻点）
+                        * 我们假定任何时候，绝大多数情况下进攻的路线都可以按次序连城一条折线，那么每次每一个子，一定都是在上一个己方棋子的八个方向之一。
+                        * 因为既可能自己进攻，也可能防守对面，所以是最后两个子的米子方向上
+                        * 那么极少数情况，进攻路线无法连成一条折线呢?很简单，我们对前双方两步不作star限制就好，这样可以 兼容一条折线中间伸出一段的情况
+                        */
+                        if (AiConfig.starspread && starspread)
+                        {
+                            if (maxScore >= (int)AiConfig.score.four) { }
+                            else if (starTo(p, attackPoints) || starTo(p, defendPoints)) { }
+                            else
+                            {
+                                count++;
+                                continue;
+                            }
+                        }
+
+                        if (scoreCom >= (int)AiConfig.score.five) //先看电脑能不能连成5
+                        {
+                            fives.Add(p);
+                        }
+                        else if (scoreHum >= (int)AiConfig.score.five) //再看玩家能不能连成5
+                        {
+                            //别急着返回，因为遍历还没完成，说不定电脑自己能成五。
+                            fives.Add(p);
+                        }
+                        else if (scoreCom >= (int)AiConfig.score.four)
+                        {
+                            comfours.Add(p);
+                        }
+                        else if (scoreHum >= (int)AiConfig.score.four)
+                        {
+                            humfours.Add(p);
+                        }
+                        else if (scoreCom >= (int)AiConfig.score.block_four)
+                        {
+                            comblockedfours.Add(p);
+                        }
+                        else if (scoreHum >= (int)AiConfig.score.block_four)
+                        {
+                            humblockedfours.Add(p);
+                        }
+                        else if (scoreCom >= 2 * (int)AiConfig.score.three) // 检查双三
+                        {
+                            comtwothrees.Add(p);
+                        }
+                        else if (scoreHum >= 2 * (int)AiConfig.score.three)
+                        {
+                            humtwothrees.Add(p);
+                        }
+                        else if (scoreCom >= (int)AiConfig.score.three)
+                        {
+                            comthrees.Add(p);
+                        }
+                        else if (scoreHum >= (int)AiConfig.score.three)
+                        {
+                            humthrees.Add(p);
+                        }
+                        else if (scoreCom >= (int)AiConfig.score.two)
+                        {
+                            comtwos.Insert(0, p);
+                        }
+                        else if (scoreHum >= (int)AiConfig.score.two)
+                        {
+                            humtwos.Insert(0, p);
+                        }
+                        else
+                        {
+                            neighbors.Add(p);
+                        }
+                    }
                 }
             }
+
+            //如果成五，是必杀棋，直接返回
+            if (fives.Count != 0)
+            {
+                return fives;
+            }
+
+            // 自己能活四，则直接活四，不考虑冲四
+            if (role == (int)AiConfig.player.com && comfours.Count != 0)
+            {
+                return comfours;
+            }
+            if (role == (int)AiConfig.player.hum && humfours.Count != 0)
+            {
+                return humfours;
+            }
+
+            // 对面有活四冲四，自己冲四都没，则只考虑对面活四 （此时对面冲四就不用考虑了)
+            if (role == (int)AiConfig.player.com && humfours.Count != 0 && comblockedfours.Count == 0)
+            {
+                return comfours;
+            }
+            if (role == (int)AiConfig.player.hum && comfours.Count != 0 && humblockedfours.Count == 0)
+            {
+                return humfours;
+            }
+
+            // 对面有活四自己有冲四，则都考虑下
+            var fours = role == (int)AiConfig.player.com ? comfours.Union(humfours).ToList<Point>() : humfours.Union(comfours).ToList<Point>();
+            var blockedfour = role == (int)AiConfig.player.com ? comblockedfours.Union(humblockedfours).ToList<Point>() : humblockedfours.Union(comblockedfours).ToList<Point>();
+            if (fours.Count != 0)
+            {
+                return fours.Union(blockedfour).ToList<Point>();
+            }
+
+            var result = new List<Point>();
+            if (role == (int)AiConfig.player.com)
+            {
+                result = comtwothrees.Union(humblockedfours).ToList<Point>();
+                result = result.Union(comblockedfours).ToList<Point>();
+                result = result.Union(humblockedfours).ToList<Point>();
+                result = result.Union(comthrees).ToList<Point>();
+                result = result.Union(humthrees).ToList<Point>();
+            }
+            if (role == (int)AiConfig.player.hum)
+            {
+                result = humtwothrees.Union(comtwothrees).ToList<Point>();
+                result = result.Union(humblockedfours).ToList<Point>();
+                result = result.Union(comblockedfours).ToList<Point>();
+                result = result.Union(humthrees).ToList<Point>();
+                result = result.Union(comthrees).ToList<Point>();
+            }
+
+            // 双三很特殊，因为能形成双三的不一定比一个活三强
+            if(comtwothrees.Count !=0 || humtwothrees.Count !=0)
+            {
+                return result;
+            }
+
+            // 只返回大于等于活三的棋
+            if(onlyThrees) {
+                return result;
+            }
+
+            var twos = new List<Point>();
+            if(role == (int)AiConfig.player.com){
+                twos = comtwos.Union(humtwos).ToList<Point>();
+            }else{
+                twos = humtwos.Union(comtwos).ToList<Point>();
+            }
+
+            twos.Sort((a,b) =>{ return b.score - a.score;});
+            result = result.Union(twos.Count != 0? twos : neighbors).ToList<Point>();
+
+            //这种分数低的，就不用全部计算了
+            if(result.Count>AiConfig.countLimit) {
+                return result.Take(AiConfig.countLimit).ToList<Point>();
+            }
+            return result;
         }
     }
 }
