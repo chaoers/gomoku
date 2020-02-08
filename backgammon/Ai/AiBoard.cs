@@ -61,7 +61,7 @@ namespace backgammon
                     {
                         if (hasNeighbor(i, j, 2, 2))
                         {
-
+                            var cs = scorePoint(i, j, (int)AiConfig.player.com, 0);
                         }
                     }
                 }
@@ -99,7 +99,7 @@ namespace backgammon
         * 这个是专门给某一个位置打分的，不是给整个棋盘打分的
         * 并且是只给某一个角色打分
         */
-        private int scorePoint(int b, int px, int py, int role, int dir)
+        private int scorePoint(int px, int py, int role, int dir)
         /*
         * 表示在当前位置下一个棋子后的分数
         * 为了性能考虑，增加了一个dir参数，如果没有传入则默认计算所有四个方向，如果传入值，则只计算其中一个方向的值
@@ -120,7 +120,7 @@ namespace backgammon
                 secondCount = 0;
             }
 
-            if (dir == 0)
+            if (dir == 0 || dir == -1)
             {
                 reset();
                 for (int i = py + 1; true; i++)
@@ -192,7 +192,237 @@ namespace backgammon
 
                 scoreCache[role][0][px, py] = countToScore(count, block, empty);
             }
-            result += scoreCache[role][3][px,py];
+            result += scoreCache[role][0][px, py];
+
+            if (dir == 1 || dir == -1)
+            {
+                reset();
+                for (int i = px + 1; true; i++)
+                {
+                    if (i >= 15)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[i, py];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && i < 15 - 1 && board[i + 1, py] == role)
+                        {
+                            empty = count;
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        count++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                for (int i = px - 1; true; i--)
+                {
+                    if (i < 0)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[i, py];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && i > 0 && board[i - 1, py] == role)
+                        {
+                            empty = 0;  //注意这里是0，因为是从右往左走的
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        secondCount++;
+                        if (empty != -1) empty++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                count += secondCount;
+
+                scoreCache[role][1][px, py] = countToScore(count, block, empty);
+            }
+            result += scoreCache[role][1][px, py];
+
+            if (dir == 2 || dir == -1)
+            {
+                reset();
+                for (int i = 1; true; i++)
+                {
+                    var x = px + i;
+                    var y = py + i;
+                    if (x >= 15 || y >= 15)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[x, y];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && (x < 15 - 1 && y < 15 - 1) && board[x + 1, y + 1] == role)
+                        {
+                            empty = count;
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        count++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                for (int i = 1; true; i++)
+                {
+                    var x = px - i;
+                    var y = py - i;
+                    if (x < 0 || y < 0)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[x, y];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && (x > 0 && y > 0) && board[x - 1, y - 1] == role)
+                        {
+                            empty = 0;  //注意这里是0，因为是从右往左走的
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        secondCount++;
+                        if (empty != -1) empty++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                count += secondCount;
+
+                scoreCache[role][2][px, py] = countToScore(count, block, empty);
+            }
+            result += scoreCache[role][2][px, py];
+
+            if (dir == 3 || dir == -1)
+            {
+                reset();
+                for (int i = 1; true; i++)
+                {
+                    var x = px + i;
+                    var y = py - i;
+                    if (x<0||y<0||x >= 15 || y >= 15)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[x, y];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && (x < 15 - 1 && y < 15 - 1) && board[x + 1, y - 1] == role)
+                        {
+                            empty = count;
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        count++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                for (int i = 1; true; i++)
+                {
+                    var x = px - i;
+                    var y = py + i;
+                    if (x < 0 || y < 0 || x>=15 || y>=15)
+                    {
+                        block++;
+                        break;
+                    }
+                    var t = board[x, y];
+                    if (t == (int)AiConfig.player.empty)
+                    {
+                        if (empty == -1 && (x > 0 && y > 0) && board[x - 1, y + 1] == role)
+                        {
+                            empty = 0;  //注意这里是0，因为是从右往左走的
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (t == role)
+                    {
+                        secondCount++;
+                        if (empty != -1) empty++;
+                        continue;
+                    }
+                    else
+                    {
+                        block++;
+                        break;
+                    }
+                }
+
+                count += secondCount;
+
+                scoreCache[role][3][px, py] = countToScore(count, block, empty);
+            }
+            result += scoreCache[role][3][px, py];
 
             return result;
         }
