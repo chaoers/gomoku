@@ -61,8 +61,17 @@ namespace backgammon
                     {
                         if (hasNeighbor(i, j, 2, 2))
                         {
-                            var cs = scorePoint(i, j, (int)AiConfig.player.com, 0);
+                            var cs = scorePoint(i, j, (int)AiConfig.player.com, -1);
+                            var hs = scorePoint(i, j, (int)AiConfig.player.hum, -1);
+                            comScore[i,j] = cs;
+                            humScore[i,j] = hs;
                         }
+                    }else if(board[i, j] == (int)AiConfig.player.com){
+                        comScore[i, j] = scorePoint(i, j, (int)AiConfig.player.com, -1);
+                        humScore[i, j] = 0;
+                    }else if(board[i, j] == (int)AiConfig.player.hum){
+                        humScore[i, j] = scorePoint(i, j, (int)AiConfig.player.hum, -1);
+                        comScore[i ,j] = 0;
                     }
                 }
             }
