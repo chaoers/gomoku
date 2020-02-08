@@ -6,18 +6,43 @@ namespace backgammon
 {
     class AiBoard
     {
-        public AiBoard(int[,] _board)
+        class AiStatistic
         {
-            board = _board;
+            private int[,] table;
+            public void init(int size)
+            {
+                table = new int[size, size];
+            }
         }
-        class Step {
+
+        class Step
+        {
             private int role;
         }
-        private int[,] board = new int[15,15];
+        // class Zobrist
+        // {
+        //     private int[,] com = new int[15,15];
+        //     private int[,] hum = new int[15,15];
+        //     public void init()
+        //     {
+        //         com = new int[15,15];
+        //         hum = new int[15,15];
+        //     }
+        // }
+
+        private AiStatistic statistic = new AiStatistic();
+        private int[,] board = new int[15, 15];
         private Step[] currentSteps = new Step[0];
         private Step[] allSteps = new Step[0];
         private int count = 0;
         private int total = 0;
+
+        // 传入棋子矩阵和位数
+        public AiBoard(int[,] _board, int size)
+        {
+            board = _board;
+            statistic.init(size);
+        }
 
         public int[] gen(int role)
         {
@@ -69,18 +94,18 @@ namespace backgammon
                 //   }
                 //   i -= 2
                 // }
-                if(attackPoints.Length != 0)
+                if (attackPoints.Length != 0)
                 {
                     // attackPoints.push(this.currentSteps[0].role === role ? this.currentSteps[0] : this.currentSteps[1])
                 }
-                if(defendPoints.Length != 0)
+                if (defendPoints.Length != 0)
                 {
                     // defendPoints.push(this.currentSteps[0].role === reverseRole? this.currentSteps[0] : this.currentSteps[1])
                 }
 
                 for (int i = 0; i < board.Length; i++)
                 {
-                    
+
                 }
             }
         }
