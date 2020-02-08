@@ -6,15 +6,18 @@ namespace backgammon
 {
     class AiBoard
     {
+        public AiBoard(int[,] _board)
+        {
+            board = _board;
+        }
         class Step {
             private int role;
         }
+        private int[,] board = new int[15,15];
         private Step[] currentSteps = new Step[0];
         private Step[] allSteps = new Step[0];
         private int count = 0;
         private int total = 0;
-        
-        public int[,] board;
 
         public int[] gen(int role)
         {
@@ -66,6 +69,19 @@ namespace backgammon
                 //   }
                 //   i -= 2
                 // }
+                if(attackPoints.Length != 0)
+                {
+                    // attackPoints.push(this.currentSteps[0].role === role ? this.currentSteps[0] : this.currentSteps[1])
+                }
+                if(defendPoints.Length != 0)
+                {
+                    // defendPoints.push(this.currentSteps[0].role === reverseRole? this.currentSteps[0] : this.currentSteps[1])
+                }
+
+                for (int i = 0; i < board.Length; i++)
+                {
+                    
+                }
             }
         }
     }
