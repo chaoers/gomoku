@@ -969,5 +969,48 @@ namespace backgammon
             }
             return result;
         }
+
+        //棋面估分
+        //这里只算当前分，而不是在空位下一步之后的分
+        public int evaluate(int role) {
+            // 这里都是用正整数初始化的，所以初始值是0
+            var comMaxScore = 0;
+            var humMaxScore = 0;
+
+            for (int i = 0; i < 15; i++)
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if(board[i, j] == (int)AiConfig.player.com)
+                    {
+                        comMaxScore += fixScore(comScore[i,j]);
+                    }else if(board[i, j] == (int)AiConfig.player.hum){
+                        humMaxScore += fixScore(humScore[i, j]);
+                    }
+                }
+            }
+
+            // 有冲四延伸了，不需要专门处理冲四活三
+            // 不过这里做了这一步，可以减少电脑胡乱冲四的毛病
+            var result = (role == (int)AiConfig.player.com ? 1 : -1) * (comMaxScore - humMaxScore);
+
+            return result;
+        }
+
+        private int fixScore(int type){
+            if(type < (int)AiConfig.score.four && type >= (int)AiConfig.score.block_four){
+                if(type >= (int)AiConfig.score.block_four && type < ((int)AiConfig.score.block_four + (int)AiConfig.score.three)){
+                    //单独冲四，意义不大
+                    return (int)AiConfig.score.three;
+                }else if(type >= (int)AiConfig.score.block_four + (int)AiConfig.score.three && type < (int)AiConfig.score.block_four*2){
+                    //冲四活三，比双三分高，相当于自己形成活四
+                    return (int)AiConfig.score.four;
+                }else{
+                    //双冲四 比活四分数也高
+                    return (int)AiConfig.score.four*2;
+                }
+            }
+            return type;
+        }
     }
 }
