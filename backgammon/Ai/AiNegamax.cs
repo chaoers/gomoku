@@ -35,6 +35,7 @@ namespace backgammon
         public void deepAll(int role, int deep)
         {
             var candidates = board.gen(role);
+            return deeping(candidates, role, deep);
         }
 
         private Step deeping(Step candidates, int role, int deep)
