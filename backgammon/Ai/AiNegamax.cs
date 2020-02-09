@@ -12,6 +12,7 @@ namespace backgammon
             public int step = 0;
             public int abcut = 0;
             public List<AiBoard.Point> steps = new List<AiBoard.Point>();
+
         }
         private AiBoard board;
         private static int MAX = (int)AiConfig.score.five * 10;
@@ -21,6 +22,8 @@ namespace backgammon
         private int ABcut;
         private int cacheCount = 0;
         private int cacheGet = 0;
+
+        private long start;
 
         private List<int> Cache;
 
@@ -34,20 +37,65 @@ namespace backgammon
             var candidates = board.gen(role);
         }
 
-        private void deeping(List<AiBoard.Point> candidates, int role, int deep)
+        private Step deeping(Step candidates, int role, int deep)
         {
             var startTime = TimeZoneInfo.ConvertTime(new System.DateTime(1970, 1, 1), TimeZoneInfo.Local);
             var timeStamp = (long)(DateTime.Now - startTime).TotalMilliseconds;
             Cache.Clear(); // 每次开始迭代的时候清空缓存。这里缓存的主要目的是在每一次的时候加快搜索，而不是长期存储。事实证明这样的清空方式对搜索速度的影响非常小（小于10%)
 
-            var bestScore;
+            int bestScore;
+            var _candidates = candidates.steps;
             for (int i = 2; i <= deep; i += 2)
             {
-                bestScore = negamax();
+                bestScore = negamax(_candidates, role, i, MIN, MAX);
+
+                //// 每次迭代剔除必败点，直到没有必败点或者只剩最后一个点
+                //// 实际上，由于必败点几乎都会被AB剪枝剪掉，因此这段代码几乎不会生效
+                //var newCandidates = candidates.filter(function (d) {
+                //  return !d.abcut
+                //})
+                //candidates = newCandidates.length ? newCandidates : [candidates[0]] // 必败了，随便走走
+
+                if (AiMath.greatOrEqualThan(bestScore, (int)AiConfig.score.five)) break;
             }
+
+            // 美化一下
+            // candidates = candidates.map(function (d) {
+            //   var r = [d[0], d[1]]
+            //   r.score = d.v.score
+            //   r.step = d.v.step
+            //   r.steps = d.v.steps
+            //   if (d.v.vct) r.vct = d.v.vct
+            //   if (d.v.vcf) r.vcf = d.v.vcf
+            //   return r
+            // 
+
+            // 排序
+            // 经过测试，这个如果放在上面的for循环中（就是每次迭代都排序），反而由于迭代深度太浅，排序不好反而会降低搜索速度。
+            candidates.steps.Sort((a, b) =>
+            {
+                if (AiMath.equal(a.score, b.score))
+                {
+                    // 大于零是优势，尽快获胜，因此取步数短的
+                    // 小于0是劣势，尽量拖延，因此取步数长的
+                    // if (a.score >= 0) {
+                    //   if (a.step !== b.step) return a.step - b.step
+                    //   else return b.score - a.score // 否则 选取当前分最高的（直接评分)
+                    // }
+                    // else {
+                    //   if (a.step !== b.step) return b.step - a.step
+                    //   else return b.score - a.score // 否则 选取当前分最高的（直接评分)
+                    // }
+                    return b.score - a.score;
+                }else{
+                    return b.score - a.score;
+                }
+            });
+            var result = candidates;
+            return result;
         }
 
-        private void negamax(List<AiBoard.Point> candidates, int role, int deep, int alpha, int beta)
+        private int negamax(List<AiBoard.Point> candidates, int role, int deep, int alpha, int beta)
         {
             count = 0;
             ABcut = 0;
@@ -58,9 +106,20 @@ namespace backgammon
             {
                 var p = candidates[i];
                 board.put(p, role);
-                var step = new List<AiBoard.Point> { p };
+                var steps = new List<AiBoard.Point> { p };
+                var v = r(deep - 1, -beta, -alpha, role == (int)AiConfig.player.com ? (int)AiConfig.player.hum : (int)AiConfig.player.com, 1, steps, 0);
+                v.score *= -1;
+                alpha = Math.Max(alpha, v.score);
+                board.remove(p);
+                // p.v = v;
 
+                if ((long)(DateTime.Now - TimeZoneInfo.ConvertTime(new System.DateTime(1970, 1, 1), TimeZoneInfo.Local)).TotalMilliseconds - start > AiConfig.timeLimit * 1000)
+                {
+                    break;
+                }
             }
+
+            return alpha;
         }
 
         private Step r(int deep, int alpha, int beta, int role, int step, List<AiBoard.Point> steps, int spread)
@@ -184,9 +243,10 @@ namespace backgammon
                 // 这里不要直接返回原来的值，因为这样上一层会以为就是这个分，实际上这个节点直接剪掉就好了，根本不用考虑，也就是直接给一个很大的值让他被减掉
                 // 这样会导致一些差不多的节点都被剪掉，但是没关系，不影响棋力
                 // 一定要注意，这里必须是 greatThan 即 明显大于，而不是 greatOrEqualThan 不然会出现很多差不多的有用分支被剪掉，会出现致命错误
-                if(AiMath.greatOrEqualThan(v.score, beta)) {
-                    ABcut ++;
-                    v.score = MAX-1; // 被剪枝的，直接用一个极大值来记录，但是注意必须比MAX小
+                if (AiMath.greatOrEqualThan(v.score, beta))
+                {
+                    ABcut++;
+                    v.score = MAX - 1; // 被剪枝的，直接用一个极大值来记录，但是注意必须比MAX小
                     v.abcut = 1; // 剪枝标记
                     // cache(deep, v) // 别缓存被剪枝的，而且，这个返回到上层之后，也注意都不要缓存
                     return v;
@@ -198,8 +258,9 @@ namespace backgammon
             return best;
         }
 
-        private bool cache(int deep, Step score){
-            if(!AiConfig.cache) return false;
+        private bool cache(int deep, Step score)
+        {
+            if (!AiConfig.cache) return false;
             return false;
         }
     }

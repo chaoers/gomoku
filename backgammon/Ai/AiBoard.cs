@@ -759,7 +759,7 @@ namespace backgammon
             // 注意除非专门处理重叠区域，否则不要把两个正方形分开算，因为一般情况下这两个正方形会有相当大的重叠面积，别重复计算了
             if (AiConfig.starspread)
             {
-                var i = currentSteps.Length - 1;
+                var i = currentSteps.Count - 1;
                 // while(i >= 0) {
                 //   var p = this.currentSteps[i]
                 //   if (reverseRole === R.com && p.scoreCom >= S.THREE
