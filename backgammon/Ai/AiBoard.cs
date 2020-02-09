@@ -9,7 +9,7 @@ namespace backgammon
     {
         class AiStatistic
         {
-            private int[,] table;
+            public int[,] table;
             public void init(int size)
             {
                 table = new int[size, size];
@@ -41,8 +41,9 @@ namespace backgammon
 
         private AiStatistic statistic = new AiStatistic();
         private int[,] board = new int[15, 15];
-        private Point[] currentSteps = new Point[0];
-        private Point[] allSteps = new Point[0];
+        public List<Point> currentSteps = new List<Point>();
+        public List<Point> allSteps = new List<Point>();
+        public List<Point> stepsTail = new List<Point>();
         private int count = 0;
         private int total = 0;
 
@@ -59,6 +60,89 @@ namespace backgammon
             board = _board;
             statistic.init(size);
             initScore();
+        }
+
+        public void put(Point p, int role)
+        {
+            p.role = role;
+
+            // this.board[p[0]][p[1]] = role 调用外部下棋函数
+
+            updateScore(p);
+            allSteps.Add(p);
+            currentSteps.Add(p);
+            stepsTail.Clear();
+            count++;
+        }
+
+        private void updateScore(Point p)
+        {
+            var radius = 4;
+            void update(int x, int y, int dir)
+            {
+                var role = board[x, y];
+                if (role != (int)AiConfig.player.hum)
+                {
+                    var cs = scorePoint(x, y, (int)AiConfig.player.hum, dir);
+                    comScore[x, y] = cs;
+                    statistic.table[x, y] += cs;
+                }
+                else
+                {
+                    comScore[x, y] = 0;
+                }
+                if (role != (int)AiConfig.player.com)
+                {
+                    var hs = scorePoint(x, y, (int)AiConfig.player.hum, dir);
+                    humScore[x, y] = hs;
+                    statistic.table[x, y] += hs;
+                }
+                else
+                {
+                    humScore[x, y] = 0;
+                }
+            }
+            
+            // 无论是不是空位 都需要更新
+            // -
+            for (int i = -radius; i <= radius; i++)
+            {
+                var x = p.p[0];
+                var y = p.p[1]+i;
+                if(y<0) continue;
+                if(y>=15) break;
+                update(x, y, 0);
+            }
+
+            // |
+            for (int i = -radius; i <= radius; i++)
+            {
+                var x = p.p[0]+i;
+                var y = p.p[1];
+                if(x<0) continue;
+                if(x>=15) break;
+                update(x, y, 1);
+            }
+
+            // \
+            for (int i = -radius; i <= radius; i++)
+            {
+                var x = p.p[0]+i;
+                var y = p.p[1]+i;
+                if(x<0 || y<0) continue;
+                if(x>=15 || y>=15) break;
+                update(x, y, 2);
+            }
+
+            // /
+            for (int i = -radius; i <= radius; i++)
+            {
+                var x = p.p[0]+i;
+                var y = p.p[1]-i;
+                if(x<0 || y<0) continue;
+                if(x>=15 || y>=15) break;
+                update(x, y, 3);
+            }
         }
 
         private void initScore()
@@ -632,7 +716,7 @@ namespace backgammon
             }
             return true;
         }
-        public List<Point> gen(int role, bool onlyThrees, bool starspread)
+        public List<Point> gen(int role, bool onlyThrees = false, bool starspread = false)
         {
             if (count <= 0)
             {
@@ -854,28 +938,33 @@ namespace backgammon
             }
 
             // 双三很特殊，因为能形成双三的不一定比一个活三强
-            if(comtwothrees.Count !=0 || humtwothrees.Count !=0)
+            if (comtwothrees.Count != 0 || humtwothrees.Count != 0)
             {
                 return result;
             }
 
             // 只返回大于等于活三的棋
-            if(onlyThrees) {
+            if (onlyThrees)
+            {
                 return result;
             }
 
             var twos = new List<Point>();
-            if(role == (int)AiConfig.player.com){
+            if (role == (int)AiConfig.player.com)
+            {
                 twos = comtwos.Union(humtwos).ToList<Point>();
-            }else{
+            }
+            else
+            {
                 twos = humtwos.Union(comtwos).ToList<Point>();
             }
 
-            twos.Sort((a,b) =>{ return b.score - a.score;});
-            result = result.Union(twos.Count != 0? twos : neighbors).ToList<Point>();
+            twos.Sort((a, b) => { return b.score - a.score; });
+            result = result.Union(twos.Count != 0 ? twos : neighbors).ToList<Point>();
 
             //这种分数低的，就不用全部计算了
-            if(result.Count>AiConfig.countLimit) {
+            if (result.Count > AiConfig.countLimit)
+            {
                 return result.Take(AiConfig.countLimit).ToList<Point>();
             }
             return result;
