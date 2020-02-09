@@ -10,6 +10,7 @@ namespace backgammon
         {
             public int score = 0;
             public int step = 0;
+            public int abcut = 0;
             public List<AiBoard.Point> steps = new List<AiBoard.Point>();
         }
         private AiBoard board;
@@ -169,10 +170,37 @@ namespace backgammon
 
                 var _steps = steps;
                 _steps.Add(p);
-                var v = r(_deep, -beta, -alpha, role == (int)AiConfig.player.com ? (int)AiConfig.player.hum : (int)AiConfig.player.com, step+1, _steps, _spread);
+                var v = r(_deep, -beta, -alpha, role == (int)AiConfig.player.com ? (int)AiConfig.player.hum : (int)AiConfig.player.com, step + 1, _steps, _spread);
                 v.score *= -1;
-                
+                board.remove(p);
+
+                // 注意，这里决定了剪枝时使用的值必须比MAX小
+                if (v.score > best.score)
+                {
+                    best = v;
+                }
+                alpha = Math.Max(best.score, alpha);
+                //AB 剪枝
+                // 这里不要直接返回原来的值，因为这样上一层会以为就是这个分，实际上这个节点直接剪掉就好了，根本不用考虑，也就是直接给一个很大的值让他被减掉
+                // 这样会导致一些差不多的节点都被剪掉，但是没关系，不影响棋力
+                // 一定要注意，这里必须是 greatThan 即 明显大于，而不是 greatOrEqualThan 不然会出现很多差不多的有用分支被剪掉，会出现致命错误
+                if(AiMath.greatOrEqualThan(v.score, beta)) {
+                    ABcut ++;
+                    v.score = MAX-1; // 被剪枝的，直接用一个极大值来记录，但是注意必须比MAX小
+                    v.abcut = 1; // 剪枝标记
+                    // cache(deep, v) // 别缓存被剪枝的，而且，这个返回到上层之后，也注意都不要缓存
+                    return v;
+                }
             }
+
+            cache(deep, best);
+
+            return best;
+        }
+
+        private bool cache(int deep, Step score){
+            if(!AiConfig.cache) return false;
+            return false;
         }
     }
 }
