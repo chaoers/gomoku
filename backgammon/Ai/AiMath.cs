@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace backgammon.Ai
+namespace backgammon
 {
     static class AiMath
     {

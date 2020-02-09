@@ -44,7 +44,7 @@ namespace backgammon
         public List<Point> currentSteps = new List<Point>();
         public List<Point> allSteps = new List<Point>();
         public List<Point> stepsTail = new List<Point>();
-        private int count = 0;
+        public int count = 0;
         private int total = 0;
 
         // scoreCache[role][dir][row,column]
@@ -67,12 +67,26 @@ namespace backgammon
             p.role = role;
 
             // this.board[p[0]][p[1]] = role 调用外部下棋函数
+            board[p.p[0], p.p[1]] = role;
 
+            // this.zobrist.go(p[0], p[1], role)
             updateScore(p);
             allSteps.Add(p);
             currentSteps.Add(p);
             stepsTail.Clear();
             count++;
+        }
+
+        public void remove(Point p)
+        {
+            var r = board[p.p[0], p.p[1]];
+            // this.zobrist.go(p[0], p[1], r)
+            board[p.p[0], p.p[1]] = (int)AiConfig.player.empty;
+
+            updateScore(p);
+            allSteps.RemoveAt(allSteps.Count -1);
+            currentSteps.RemoveAt(currentSteps.Count -1);
+            count--;
         }
 
         private void updateScore(Point p)
@@ -102,45 +116,45 @@ namespace backgammon
                     humScore[x, y] = 0;
                 }
             }
-            
+
             // 无论是不是空位 都需要更新
             // -
             for (int i = -radius; i <= radius; i++)
             {
                 var x = p.p[0];
-                var y = p.p[1]+i;
-                if(y<0) continue;
-                if(y>=15) break;
+                var y = p.p[1] + i;
+                if (y < 0) continue;
+                if (y >= 15) break;
                 update(x, y, 0);
             }
 
             // |
             for (int i = -radius; i <= radius; i++)
             {
-                var x = p.p[0]+i;
+                var x = p.p[0] + i;
                 var y = p.p[1];
-                if(x<0) continue;
-                if(x>=15) break;
+                if (x < 0) continue;
+                if (x >= 15) break;
                 update(x, y, 1);
             }
 
             // \
             for (int i = -radius; i <= radius; i++)
             {
-                var x = p.p[0]+i;
-                var y = p.p[1]+i;
-                if(x<0 || y<0) continue;
-                if(x>=15 || y>=15) break;
+                var x = p.p[0] + i;
+                var y = p.p[1] + i;
+                if (x < 0 || y < 0) continue;
+                if (x >= 15 || y >= 15) break;
                 update(x, y, 2);
             }
 
             // /
             for (int i = -radius; i <= radius; i++)
             {
-                var x = p.p[0]+i;
-                var y = p.p[1]-i;
-                if(x<0 || y<0) continue;
-                if(x>=15 || y>=15) break;
+                var x = p.p[0] + i;
+                var y = p.p[1] - i;
+                if (x < 0 || y < 0) continue;
+                if (x >= 15 || y >= 15) break;
                 update(x, y, 3);
             }
         }
@@ -782,7 +796,7 @@ namespace backgammon
                     if (board[i, j] == (int)AiConfig.player.empty)
                     {
 
-                        if (allSteps.Length < 6)
+                        if (allSteps.Count < 6)
                         {
                             if (!hasNeighbor(i, j, 1, 1))
                             {
@@ -972,7 +986,8 @@ namespace backgammon
 
         //棋面估分
         //这里只算当前分，而不是在空位下一步之后的分
-        public int evaluate(int role) {
+        public int evaluate(int role)
+        {
             // 这里都是用正整数初始化的，所以初始值是0
             var comMaxScore = 0;
             var humMaxScore = 0;
@@ -981,10 +996,12 @@ namespace backgammon
             {
                 for (int j = 0; j < 15; j++)
                 {
-                    if(board[i, j] == (int)AiConfig.player.com)
+                    if (board[i, j] == (int)AiConfig.player.com)
                     {
-                        comMaxScore += fixScore(comScore[i,j]);
-                    }else if(board[i, j] == (int)AiConfig.player.hum){
+                        comMaxScore += fixScore(comScore[i, j]);
+                    }
+                    else if (board[i, j] == (int)AiConfig.player.hum)
+                    {
                         humMaxScore += fixScore(humScore[i, j]);
                     }
                 }
@@ -997,17 +1014,24 @@ namespace backgammon
             return result;
         }
 
-        private int fixScore(int type){
-            if(type < (int)AiConfig.score.four && type >= (int)AiConfig.score.block_four){
-                if(type >= (int)AiConfig.score.block_four && type < ((int)AiConfig.score.block_four + (int)AiConfig.score.three)){
+        private int fixScore(int type)
+        {
+            if (type < (int)AiConfig.score.four && type >= (int)AiConfig.score.block_four)
+            {
+                if (type >= (int)AiConfig.score.block_four && type < ((int)AiConfig.score.block_four + (int)AiConfig.score.three))
+                {
                     //单独冲四，意义不大
                     return (int)AiConfig.score.three;
-                }else if(type >= (int)AiConfig.score.block_four + (int)AiConfig.score.three && type < (int)AiConfig.score.block_four*2){
+                }
+                else if (type >= (int)AiConfig.score.block_four + (int)AiConfig.score.three && type < (int)AiConfig.score.block_four * 2)
+                {
                     //冲四活三，比双三分高，相当于自己形成活四
                     return (int)AiConfig.score.four;
-                }else{
+                }
+                else
+                {
                     //双冲四 比活四分数也高
-                    return (int)AiConfig.score.four*2;
+                    return (int)AiConfig.score.four * 2;
                 }
             }
             return type;

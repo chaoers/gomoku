@@ -62,7 +62,7 @@ namespace backgammon
             }
         }
 
-        private AiBoard.Point r(int deep, int alpha, int beta, int role, int step, List<AiBoard.Point> steps, int spread)
+        private Step r(int deep, int alpha, int beta, int role, int step, List<AiBoard.Point> steps, int spread)
         {
             // if(config.cache) {
             //   var c = Cache[board.zobrist.code]
@@ -97,7 +97,82 @@ namespace backgammon
             count++;
             // 搜索到底 或者已经胜利
             // 注意这里是小于0，而不是1，因为本次直接返回结果并没有下一步棋
-            if(deep <= 0 || )
+            if (deep <= 0 || AiMath.greatOrEqualThan(_e, (int)AiConfig.score.five) || AiMath.littleOrEqualThan(_e, -(int)AiConfig.score.five))
+            {
+                //// 经过测试，把算杀放在对子节点的搜索之后，比放在前面速度更快一些。
+                //// vcf
+                //// 自己没有形成活四，对面也没有形成活四，那么先尝试VCF
+                //if(math.littleThan(_e, SCORE.FOUR) && math.greatThan(_e, SCORE.FOUR * -1)) {
+                //  mate = vcx.vcf(role, vcxDeep)
+                //  if(mate) {
+                //    config.debug && console.log('vcf success')
+                //    v = {
+                //      score: mate.score,
+                //      step: step + mate.length,
+                //      steps: steps,
+                //      vcf: mate // 一个标记为，表示这个值是由vcx算出的
+                //    }
+                //    return v
+                //  }
+                //} // vct
+                //// 自己没有形成活三，对面也没有高于活三的棋型，那么尝试VCT
+                //if(math.littleThan(_e, SCORE.THREE*2) && math.greatThan(_e, SCORE.THREE * -2)) {
+                //  var mate = vcx.vct(role, vcxDeep)
+                //  if(mate) {
+                //    config.debug && console.log('vct success')
+                //    v = {
+                //      score: mate.score,
+                //      step: step + mate.length,
+                //      steps: steps,
+                //      vct: mate // 一个标记为，表示这个值是由vcx算出的
+                //    }
+                //  return v
+                //  }
+                //}
+                return leaf;
+            }
+
+            var best = new Step();
+            best.score = MIN;
+            best.step = step;
+            best.steps = steps;
+
+            // 双方个下两个子之后，开启star spread 模式
+            var points = board.gen(role, board.count > 10 ? step > 1 : step > 3, step > 1);
+
+            if (points.Count != 0)
+            {
+                return leaf;
+            }
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                var p = points[i];
+                board.put(p, role);
+
+                var _deep = deep - 1;
+                var _spread = spread;
+                if (_spread < AiConfig.countLimit)
+                {
+                    // 冲四延伸
+                    if ((role == (int)AiConfig.player.com && p.scoreHum >= (int)AiConfig.score.five) || (role == (int)AiConfig.player.hum && p.scoreCom >= (int)AiConfig.score.five))
+                    {
+                        _deep += 2;
+                        _spread++;
+                    }
+                    // 单步延伸策略：双三延伸
+                    //if ( (role == R.com && p.scoreCom >= SCORE.THREE * 2) || (role == R.hum && p.scoreHum >= SCORE.THREE*2)) {
+                    //  _deep = deep
+                    //  _spread ++
+                    //}
+                }
+
+                var _steps = steps;
+                _steps.Add(p);
+                var v = r(_deep, -beta, -alpha, role == (int)AiConfig.player.com ? (int)AiConfig.player.hum : (int)AiConfig.player.com, step+1, _steps, _spread);
+                v.score *= -1;
+                
+            }
         }
     }
 }
