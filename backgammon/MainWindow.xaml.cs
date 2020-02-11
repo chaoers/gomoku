@@ -31,24 +31,60 @@ namespace backgammon
     
             MouseDown += (s, e) => pan_MouseDown(s, e); // 监听鼠标移动
             addButton();
+
             logText.AppendText("五子棋小游戏\n");
             logText.AppendText("author:Fan Guofan\n");
             logText.AppendText("GITHUB:https://github.com/chaoers/gomoku\n");
             logText.AppendText("If you like it,please give me a star!\n");
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("初始化完成\n");
+        }
+
+        public bool IsVerticalScrollBarAtBottom
+        {
+            get
+            {
+                bool atBottom = false;
+
+                logText.Dispatcher.Invoke((Action)delegate
+                {
+                    double dVer = logText.VerticalOffset;       //获取竖直滚动条滚动位置
+                    double dViewport = logText.ViewportHeight;  //获取竖直可滚动内容高度
+                    double dExtent = logText.ExtentHeight;      //获取可视区域的高度
+
+                    if (dVer + dViewport >= dExtent)
+                    {
+                        atBottom = true;
+                    }
+                    else
+                    {
+                        atBottom = false;
+                    }
+                });
+
+                return atBottom;
+            }
         }
 
         private void multiplayer(object sender, RoutedEventArgs e)
         {
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("切换为玩家对战\n");
+            pan.Children.Clear();
+            mainboard.clearPiece();
         }
         private void singleplayer(object sender, RoutedEventArgs e)
         {
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("切换为AI对战\n");
             ai = new Ai();
             ai.start();
-            mainboard.clearPiece();
-            pan.UnregisterName("drawButton");
+            pan.Children.Clear();
+            Button btn = pan.FindName("drawButton") as Button;
+            if(btn != null)
+            {
+                pan.UnregisterName("drawButton");
+            }
             addButton();
             isAi = true;
         }
@@ -59,6 +95,7 @@ namespace backgammon
             pan.Children.Add(black);
             Canvas.SetLeft(black, X-15);
             Canvas.SetTop(black, Y-15);
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("添加黑棋\n");
             return black;
         }
@@ -68,12 +105,14 @@ namespace backgammon
             pan.Children.Add(white);
             Canvas.SetLeft(white, X-15);
             Canvas.SetTop(white, Y-15);
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("添加白棋\n");
             return white;
         }
 
         private void startDraw()
         {
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("开始构建棋盘\n");
             var storyboard = new Storyboard();
             for (int i = 0; i < 15; i++)
@@ -134,6 +173,7 @@ namespace backgammon
         }
         private void finishDraw(object sender, EventArgs eventArgs)
         {
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("构建棋盘完成\n");
             isWinBool = false;
             if (isAi)
@@ -150,7 +190,7 @@ namespace backgammon
                 Name = "startButton",
                 Content = "构建棋盘",
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(266, 266, 0, 0),
+                Margin = new Thickness(246, 266, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
                 Height = 58,
                 Width = 104,
@@ -209,6 +249,13 @@ namespace backgammon
 
         private void downPiece(int X,int Y)
         {
+            logText.Dispatcher.BeginInvoke((Action)delegate
+            {
+                if (IsVerticalScrollBarAtBottom)
+                {
+                    logText.ScrollToEnd();
+                }
+            });
             if (color)
             {
                 mainboard.pieceNum[X, Y] = 1;
@@ -216,7 +263,13 @@ namespace backgammon
                 var win = isWin(X, Y);
                 if(win == true)
                 {
+                    logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
                     logText.AppendText("游戏结束，黑棋胜利\n");
+                    if (isAi)
+                    {
+                        ai = new Ai();
+                        ai.start();
+                    }
                     mainboard.clearPiece();
                     addButton();
                     isWinBool = true;
@@ -234,7 +287,13 @@ namespace backgammon
                 var win = isWin(X, Y);
                 if (win == true)
                 {
+                    logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
                     logText.AppendText("游戏结束，白棋胜利\n");
+                    if (isAi)
+                    {
+                        ai = new Ai();
+                        ai.start();
+                    }
                     mainboard.clearPiece();
                     addButton();
                     isWinBool = true;
@@ -314,7 +373,7 @@ namespace backgammon
                 left_top++;
             }
             var right_bottom = 0;
-            for (int[] i = { X, Y }; i[0] < 15 && i[1] <= 15; i[0]++, i[1]++)
+            for (int[] i = { X, Y }; i[0] < 15 && i[1] < 15; i[0]++, i[1]++)
             {
                 if (mainboard.pieceNum[i[0], i[1]] != Z)
                 {

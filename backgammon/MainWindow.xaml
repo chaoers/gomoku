@@ -25,7 +25,8 @@
         </Grid>
         <Grid HorizontalAlignment="Left" Height="298" Margin="672,150,0,0" VerticalAlignment="Top" Width="475">
             <materialDesign:Card>
-                <TextBox x:Name="logText" HorizontalAlignment="Center" Height="264" Margin="0,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="432" IsReadOnly="True"/>
+                <TextBox x:Name="logText" HorizontalAlignment="Center" Height="264" Margin="0,20,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="432" IsReadOnly="True" VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Auto"/>
             </materialDesign:Card>
         </Grid>
     </Grid>

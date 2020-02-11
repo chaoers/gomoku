@@ -9,7 +9,7 @@ namespace backgammon
         public int[,] pieceNum = new int[15, 15];
         // 0-没有棋子 1-有黑棋 2-有白棋
         private static readonly int DISTANCE = 40;
-        private static readonly int RADIUS = 5;
+        private static readonly int RADIUS = 10;
 
         public void clearPiece()
         {
