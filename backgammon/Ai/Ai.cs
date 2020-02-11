@@ -32,5 +32,15 @@ namespace backgammon
             aiBoard.put(p, (int)AiConfig.player.com);
             return p.p;
         }
+
+        public int[] turn(int x, int y){
+            set(x,y);
+            return begin();
+        }
+
+        private void set(int x, int y){
+            var p =new AiBoard.Point(x,y);
+            aiBoard.put(p, (int)AiConfig.player.hum);
+        }
     }
 }

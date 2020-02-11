@@ -64,11 +64,7 @@ namespace backgammon
         public void put(Point p, int role)
         {
             p.role = role;
-
-            // this.board[p[0]][p[1]] = role 调用外部下棋函数
             board[p.p[0], p.p[1]] = role;
-
-            // this.zobrist.go(p[0], p[1], role)
             updateScore(p);
             allSteps.Add(p);
             currentSteps.Add(p);
@@ -403,7 +399,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x < 15 - 1 && y < 15 - 1) && board[x + 1, y + 1] == role)
+                        if (empty == -1 && (x < 15 - 1 && y< 15-1) && board[x + 1, y + 1] == role)
                         {
                             empty = count;
                             continue;
@@ -437,7 +433,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x > 0 && y > 0) && board[x - 1, y - 1] == role)
+                        if (empty == -1 && (x > 0 && y>0) && board[x - 1, y - 1] == role)
                         {
                             empty = 0;  //注意这里是0，因为是从右往左走的
                             continue;
@@ -481,7 +477,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x < 15 - 1 && y < 15 - 1) && board[x + 1, y - 1] == role)
+                        if (empty == -1 && (x < 15 - 1 && y >0) && board[x + 1, y - 1] == role)
                         {
                             empty = count;
                             continue;
@@ -507,7 +503,7 @@ namespace backgammon
                 {
                     var x = px - i;
                     var y = py + i;
-                    if (x < 0 || y < 0 || x >= 15 || y >= 15)
+                    if (x < 0 || y < 0 || x >= 14 || y >= 14)
                     {
                         block++;
                         break;

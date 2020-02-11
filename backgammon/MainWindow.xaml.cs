@@ -18,8 +18,9 @@ namespace backgammon
 {
     public partial class MainWindow : Window
     {
-        private bool isWinBool = true;
         private Ai ai;
+        private bool isAi = false;
+        private bool isWinBool = true;
         public static MainWindow mainWindow;
         public bool color = true;
         // 1-黑 0-白
@@ -41,6 +42,12 @@ namespace backgammon
         private void singleplayer(object sender, RoutedEventArgs e)
         {
             logText.AppendText("切换为AI对战\n");
+            ai = new Ai();
+            ai.start();
+            mainboard.clearPiece();
+            pan.UnregisterName("drawButton");
+            addButton();
+            isAi = true;
         }
 
         private BlackPiece addBlack(int X, int Y)
@@ -126,6 +133,9 @@ namespace backgammon
         {
             logText.AppendText("构建棋盘完成\n");
             isWinBool = false;
+            var down = ai.begin();
+            downPiece(down[0], down[1]);
+            logText.AppendText(down[0].ToString()+"   "+down[1].ToString());
         }
         private void addButton()
         {
@@ -193,7 +203,7 @@ namespace backgammon
 
         private void downPiece(int X,int Y)
         {
-            if(color == true)
+            if (color)
             {
                 mainboard.pieceNum[X, Y] = 1;
                 addBlack(X * 40 + 10, Y * 40 + 10);
@@ -227,13 +237,18 @@ namespace backgammon
                 else
                 {
                     color = true;
+                    if (isAi)
+                    {
+                        var down = ai.turn(Y, X);
+                        downPiece(down[1], down[0]);
+                    }
                 }
             }
         }
 
         private bool isWin(int X,int Y)
         {
-            var Z = color == true ? 1 : 2;
+            var Z = color ? 1 : 2;
             // 横向查找
             var left = 0;
             for(int i = X;i >= 0; i--)

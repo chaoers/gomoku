@@ -25,7 +25,7 @@ namespace backgammon
 
         private long start;
 
-        private List<int> Cache;
+        private List<int> Cache = new List<int>();
 
         public void init(AiBoard _board)
         {
