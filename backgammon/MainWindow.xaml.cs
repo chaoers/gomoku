@@ -31,7 +31,10 @@ namespace backgammon
     
             MouseDown += (s, e) => pan_MouseDown(s, e); // 监听鼠标移动
             addButton();
-
+            logText.AppendText("五子棋小游戏\n");
+            logText.AppendText("author:Fan Guofan\n");
+            logText.AppendText("GITHUB:https://github.com/chaoers/gomoku\n");
+            logText.AppendText("If you like it,please give me a star!\n");
             logText.AppendText("初始化完成\n");
         }
 
@@ -133,9 +136,12 @@ namespace backgammon
         {
             logText.AppendText("构建棋盘完成\n");
             isWinBool = false;
-            var down = ai.begin();
-            downPiece(down[0], down[1]);
-            logText.AppendText(down[0].ToString()+"   "+down[1].ToString());
+            if (isAi)
+            {
+                var down = ai.begin();
+                downPiece(down[0], down[1]);
+                logText.AppendText(down[0].ToString()+"   "+down[1].ToString());
+            }
         }
         private void addButton()
         {
@@ -239,8 +245,10 @@ namespace backgammon
                     color = true;
                     if (isAi)
                     {
+                        isWinBool = true;
                         var down = ai.turn(Y, X);
                         downPiece(down[1], down[0]);
+                        isWinBool = false;
                     }
                 }
             }

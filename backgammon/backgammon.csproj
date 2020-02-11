@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\black.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
