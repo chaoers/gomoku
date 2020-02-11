@@ -19,6 +19,7 @@ namespace backgammon
     public partial class MainWindow : Window
     {
         private bool isWinBool = true;
+        private Ai ai;
         public static MainWindow mainWindow;
         public bool color = true;
         // 1-黑 0-白

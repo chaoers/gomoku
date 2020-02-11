@@ -39,7 +39,7 @@ namespace backgammon
         //     }
         // }
 
-        private AiStatistic statistic = new AiStatistic();
+        // private AiStatistic statistic = new AiStatistic();
         public int[,] board = new int[15, 15];
         public List<Point> currentSteps = new List<Point>();
         public List<Point> allSteps = new List<Point>();
@@ -55,10 +55,9 @@ namespace backgammon
         private int[,] humScore = new int[15, 15];
 
         // 传入棋子矩阵和位数
-        public AiBoard(int[,] _board, int size)
+        public void init(int size)
         {
-            board = _board;
-            statistic.init(size);
+            // statistic.init(size);
             initScore();
         }
 
@@ -99,7 +98,7 @@ namespace backgammon
                 {
                     var cs = scorePoint(x, y, (int)AiConfig.player.hum, dir);
                     comScore[x, y] = cs;
-                    statistic.table[x, y] += cs;
+                    // statistic.table[x, y] += cs;
                 }
                 else
                 {
@@ -109,7 +108,7 @@ namespace backgammon
                 {
                     var hs = scorePoint(x, y, (int)AiConfig.player.hum, dir);
                     humScore[x, y] = hs;
-                    statistic.table[x, y] += hs;
+                    // statistic.table[x, y] += hs;
                 }
                 else
                 {

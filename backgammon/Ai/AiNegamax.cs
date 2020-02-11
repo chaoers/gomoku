@@ -27,28 +27,27 @@ namespace backgammon
 
         private List<int> Cache;
 
-        AiNegamax(AiBoard _board)
+        public void init(AiBoard _board)
         {
             board = _board;
         }
 
-        public void deepAll(int role, int deep)
+        public List<AiBoard.Point> deepAll(int deep, int role = (int)AiConfig.player.com)
         {
             var candidates = board.gen(role);
             return deeping(candidates, role, deep);
         }
 
-        private Step deeping(Step candidates, int role, int deep)
+        private List<AiBoard.Point> deeping(List<AiBoard.Point> candidates, int role, int deep)
         {
             var startTime = TimeZoneInfo.ConvertTime(new System.DateTime(1970, 1, 1), TimeZoneInfo.Local);
             var timeStamp = (long)(DateTime.Now - startTime).TotalMilliseconds;
             Cache.Clear(); // 每次开始迭代的时候清空缓存。这里缓存的主要目的是在每一次的时候加快搜索，而不是长期存储。事实证明这样的清空方式对搜索速度的影响非常小（小于10%)
 
             int bestScore;
-            var _candidates = candidates.steps;
             for (int i = 2; i <= deep; i += 2)
             {
-                bestScore = negamax(_candidates, role, i, MIN, MAX);
+                bestScore = negamax(candidates, role, i, MIN, MAX);
 
                 //// 每次迭代剔除必败点，直到没有必败点或者只剩最后一个点
                 //// 实际上，由于必败点几乎都会被AB剪枝剪掉，因此这段代码几乎不会生效
@@ -73,7 +72,7 @@ namespace backgammon
 
             // 排序
             // 经过测试，这个如果放在上面的for循环中（就是每次迭代都排序），反而由于迭代深度太浅，排序不好反而会降低搜索速度。
-            candidates.steps.Sort((a, b) =>
+            candidates.Sort((a, b) =>
             {
                 if (AiMath.equal(a.score, b.score))
                 {
