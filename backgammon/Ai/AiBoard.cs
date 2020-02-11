@@ -40,7 +40,7 @@ namespace backgammon
         // }
 
         private AiStatistic statistic = new AiStatistic();
-        private int[,] board = new int[15, 15];
+        public int[,] board = new int[15, 15];
         public List<Point> currentSteps = new List<Point>();
         public List<Point> allSteps = new List<Point>();
         public List<Point> stepsTail = new List<Point>();
