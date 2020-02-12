@@ -34,8 +34,11 @@ namespace backgammon
 
         public List<AiBoard.Point> deepAll(int deep, int role = (int)AiConfig.player.com)
         {
-            var candidates = board.gen(role);
-            return deeping(candidates, role, deep);
+            var candidates = new List<AiBoard.Point>();
+            board.gen(role).ForEach(i => candidates.Add(i));
+            var result = new List<AiBoard.Point>();
+            deeping(candidates, role, deep).ForEach(i => result.Add(i));
+            return result;
         }
 
         private List<AiBoard.Point> deeping(List<AiBoard.Point> candidates, int role, int deep)
