@@ -41,6 +41,10 @@
             "MaterialDesignThemes": {
               "target": "Package",
               "version": "[3.0.1, )"
+            },
+            "ShowMeTheXAML": {
+              "target": "Package",
+              "version": "[1.0.12, )"
             }
           },
           "imports": [

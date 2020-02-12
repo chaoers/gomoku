@@ -4,8 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:backgammon"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1200"
+        mc:Ignorable="d" Height="800" Width="1200"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -13,10 +12,10 @@
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        FontFamily="Microsoft YaHei" Title="gomoku">
     <Grid MouseDown="pan_MouseDown" MouseMove="Grid_MouseMove">
-        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="27,21,0,0" VerticalAlignment="Top" Click="multiplayer" Height="39" Width="82"/>
-        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="148,21,0,0" VerticalAlignment="Top" Click="singleplayer" Height="39" Width="82" Cursor="Hand"/>
+        <Button x:Name="player" Content="玩家对战" HorizontalAlignment="Left" Margin="699,559,0,0" VerticalAlignment="Top" Click="multiplayer" Height="90" Width="160" Cursor="Hand" FontSize="20" FontFamily="Microsoft YaHei"/>
+        <Button x:Name="aiplayer" Content="AI对战" HorizontalAlignment="Left" Margin="962,559,0,0" VerticalAlignment="Top" Click="singleplayer" Height="90" Width="160" Cursor="Hand" FontSize="20" FontFamily="Microsoft YaHei"/>
         <Grid HorizontalAlignment="Left" Height="600" Margin="27,95,0,0" VerticalAlignment="Top" Width="600
               ">
             <materialDesign:Card Margin="0,0,10,10">

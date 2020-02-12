@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 
@@ -38,46 +30,57 @@ namespace backgammon
             logText.AppendText("GITHUB:https://github.com/chaoers/gomoku\n");
             logText.AppendText("If you like it,please give me a star!\n");
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("初始化完成\n");
+            logText.AppendText("初始化完成,默认模式为玩家对战模式\n");
         }
 
-        public bool IsVerticalScrollBarAtBottom
-        {
-            get
-            {
-                bool atBottom = false;
+        // public bool IsVerticalScrollBarAtBottom
+        // {
+        //     get
+        //     {
+        //         bool atBottom = false;
 
-                logText.Dispatcher.Invoke((Action)delegate
-                {
-                    double dVer = logText.VerticalOffset;       //获取竖直滚动条滚动位置
-                    double dViewport = logText.ViewportHeight;  //获取竖直可滚动内容高度
-                    double dExtent = logText.ExtentHeight;      //获取可视区域的高度
+        //         logText.Dispatcher.Invoke((Action)delegate
+        //         {
+        //             double dVer = logText.VerticalOffset;       //获取竖直滚动条滚动位置
+        //             double dViewport = logText.ViewportHeight;  //获取竖直可滚动内容高度
+        //             double dExtent = logText.ExtentHeight;      //获取可视区域的高度
 
-                    if (dVer + dViewport >= dExtent)
-                    {
-                        atBottom = true;
-                    }
-                    else
-                    {
-                        atBottom = false;
-                    }
-                });
+        //             if (dVer + dViewport >= dExtent)
+        //             {
+        //                 atBottom = true;
+        //             }
+        //             else
+        //             {
+        //                 atBottom = false;
+        //             }
+        //         });
 
-                return atBottom;
-            }
-        }
+        //         return atBottom;
+        //     }
+        // }
 
         private void multiplayer(object sender, RoutedEventArgs e)
         {
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("切换为玩家对战\n");
+            logText.AppendText("切换为玩家对战，请点击构建棋盘开始游戏\n");
             pan.Children.Clear();
+            Button btn = pan.FindName("drawButton") as Button;
+            if (btn != null)
+            {
+                pan.UnregisterName("drawButton");
+            }
+            addButton();
             mainboard.clearPiece();
+            isAi = false;
         }
         private void singleplayer(object sender, RoutedEventArgs e)
         {
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("切换为AI对战\n");
+            logText.AppendText("切换为AI对战，请点击构建棋盘开始游戏\n");
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
+            logText.AppendText("本AI采用极小化极大值搜索+Alpha-Beta剪枝算法+启发式评估函数+算杀单元构成\n");
+            logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
+            logText.AppendText("搜索深度"+AiConfig.searchDeep.ToString()+ " 节点数量上限"+AiConfig.countLimit.ToString()+ " 算杀深度"+AiConfig.vcxDeep.ToString()+"\n");
             ai = new Ai();
             ai.start();
             pan.Children.Clear();
@@ -87,6 +90,7 @@ namespace backgammon
                 pan.UnregisterName("drawButton");
             }
             addButton();
+            mainboard.clearPiece();
             isAi = true;
         }
 
@@ -126,7 +130,7 @@ namespace backgammon
 
                 var path = new Path()
                 {
-                    Stroke = Brushes.Black,
+                    Stroke = Brushes.DarkSlateGray,
                     StrokeThickness = 2,
                     Data = line
                 };
@@ -150,7 +154,7 @@ namespace backgammon
 
                 var path = new Path()
                 {
-                    Stroke = Brushes.Black,
+                    Stroke = Brushes.DarkSlateGray,
                     StrokeThickness = 2,
                     Data = line
                 };
@@ -194,7 +198,7 @@ namespace backgammon
                 Margin = new Thickness(246, 266, 0, 0),
                 VerticalAlignment = VerticalAlignment.Top,
                 Height = 58,
-                Width = 104,
+                Width = 104
             };
             btn.Click += new RoutedEventHandler(drawButton);
             pan.Children.Add(btn);
@@ -252,10 +256,10 @@ namespace backgammon
         {
             logText.Dispatcher.BeginInvoke((Action)delegate
             {
-                if (IsVerticalScrollBarAtBottom)
-                {
+                // if (IsVerticalScrollBarAtBottom)
+                // {
                     logText.ScrollToEnd();
-                }
+                // }
             });
             if (!isWinBool)
             {
