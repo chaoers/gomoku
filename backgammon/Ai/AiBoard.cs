@@ -915,11 +915,11 @@ namespace backgammon
             // 对面有活四冲四，自己冲四都没，则只考虑对面活四 （此时对面冲四就不用考虑了)
             if (role == (int)AiConfig.player.com && humfours.Count != 0 && comblockedfours.Count == 0)
             {
-                return comfours;
+                return humfours;
             }
             if (role == (int)AiConfig.player.hum && comfours.Count != 0 && humblockedfours.Count == 0)
             {
-                return humfours;
+                return comfours;
             }
 
             // 对面有活四自己有冲四，则都考虑下
