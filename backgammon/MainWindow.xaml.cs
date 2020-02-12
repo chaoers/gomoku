@@ -305,8 +305,8 @@ namespace backgammon
                     if (isAi)
                     {
                         isWinBool = true;
-                        var down = ai.turn(Y, X);
-                        downPiece(down[1], down[0]);
+                        var down = ai.turn(X, Y);
+                        downPiece(down[0], down[1]);
                         isWinBool = false;
                     }
                 }

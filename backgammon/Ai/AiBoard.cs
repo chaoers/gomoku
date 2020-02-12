@@ -92,7 +92,7 @@ namespace backgammon
                 var role = board[x, y];
                 if (role != (int)AiConfig.player.hum)
                 {
-                    var cs = scorePoint(x, y, (int)AiConfig.player.hum, dir);
+                    var cs = scorePoint(x, y, (int)AiConfig.player.com, dir);
                     comScore[x, y] = cs;
                     // statistic.table[x, y] += cs;
                 }
@@ -702,14 +702,14 @@ namespace backgammon
 
             return 0;
         }
-        private bool starTo(Point point, Point[] points)
+        private bool starTo(Point point, List<Point> points)
         {
-            if (points.Length == 0)
+            if (points.Count == 0)
             {
                 return false;
             }
             var a = point;
-            for (int i = 0; i < points.Length; i++)
+            for (int i = 0; i < points.Count; i++)
             {
                 var b = points[i];
                 // 距离必须在5步以内
@@ -718,7 +718,7 @@ namespace backgammon
                     return false;
                 }
                 // 必须在米子方向上
-                if (!(a.p[0] == b.p[0] || a.p[1] == b.p[1] || (Math.Abs(a.p[0] - b.p[0]) == Math.Abs(a.p[0] - b.p[0]))))
+                if (!(a.p[0] == b.p[0] || a.p[1] == b.p[1] || (Math.Abs(a.p[0] - b.p[0]) == Math.Abs(a.p[1] - b.p[1]))))
                 {
                     return false;
                 }
@@ -746,8 +746,8 @@ namespace backgammon
 
             var reverseRole = role == 1 ? 2 : 1;
             // 找到双方的最后进攻点
-            Point[] attackPoints = new Point[0];
-            Point[] defendPoints = new Point[0];
+            List<Point> attackPoints = new List<Point>();
+            List<Point> defendPoints = new List<Point>();
 
             // 默认情况下 我们遍历整个棋盘。但是在开启star模式下，我们遍历的范围就会小很多
             // 只需要遍历以两个点为中心正方形。
@@ -755,33 +755,33 @@ namespace backgammon
             if (AiConfig.starspread)
             {
                 var i = currentSteps.Count - 1;
-                // while(i >= 0) {
-                //   var p = this.currentSteps[i]
-                //   if (reverseRole === R.com && p.scoreCom >= S.THREE
-                //     || reverseRole === R.hum && p.scoreHum >= S.THREE) {
-                //     defendPoints.push(p)
-                //     break
-                //   }
-                //   i -= 2
-                // }
-
-                // var i = currentSteps.Length - 2;
-                // while(i >= 0) {
-                //   var p = this.currentSteps[i]
-                //   if (role === R.com && p.scoreCom >= S.THREE
-                //     || role === R.hum && p.scoreHum >= S.THREE) {
-                //     attackPoints.push(p)
-                //     break;
-                //   }
-                //   i -= 2
-                // }
-                if (attackPoints.Length != 0)
-                {
-                    // attackPoints.push(this.currentSteps[0].role === role ? this.currentSteps[0] : this.currentSteps[1])
+                while(i >= 0) {
+                  var p = currentSteps[i];
+                  if (reverseRole == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
+                    || reverseRole == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three) {
+                    defendPoints.Add(p);
+                    break;
+                  }
+                  i -= 2;
                 }
-                if (defendPoints.Length != 0)
+
+                var j = currentSteps.Count - 2;
+                while(j >= 0) {
+                  var p = currentSteps[j];
+                  if (role == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
+                    || role == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three) {
+                    defendPoints.Add(p);
+                    break;
+                  }
+                  j -= 2;
+                }
+                if (attackPoints.Count != 0)
                 {
-                    // defendPoints.push(this.currentSteps[0].role === reverseRole? this.currentSteps[0] : this.currentSteps[1])
+                    attackPoints.Add(currentSteps[0].role == role ? currentSteps[0] : currentSteps[1]);
+                }
+                if (defendPoints.Count != 0)
+                {
+                    defendPoints.Add(currentSteps[0].role == reverseRole? currentSteps[0] : currentSteps[1]);
                 }
             }
             for (int i = 0; i < 15; i++)
@@ -829,6 +829,8 @@ namespace backgammon
                         if (AiConfig.starspread && starspread)
                         {
                             if (maxScore >= (int)AiConfig.score.four) { }
+                            else if(maxScore >= (int)AiConfig.score.block_four && starTo(currentSteps[currentSteps.Count -1], defendPoints)) {}
+                            //star 路径不是很准，所以考虑冲四防守对手最后一步的棋
                             else if (starTo(p, attackPoints) || starTo(p, defendPoints)) { }
                             else
                             {
