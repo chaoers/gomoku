@@ -79,8 +79,8 @@ namespace backgammon
             board[p.p[0], p.p[1]] = (int)AiConfig.player.empty;
 
             updateScore(p);
-            allSteps.RemoveAt(allSteps.Count -1);
-            currentSteps.RemoveAt(currentSteps.Count -1);
+            allSteps.RemoveAt(allSteps.Count - 1);
+            currentSteps.RemoveAt(currentSteps.Count - 1);
             count--;
         }
 
@@ -190,10 +190,10 @@ namespace backgammon
             var endX = x + distance;
             var startY = y - distance;
             var endY = y + distance;
-            for (int i = startX; i < endX; i++)
+            for (int i = startX; i <= endX; i++)
             {
                 if (i < 0 || i >= 15) continue;
-                for (int j = startY; j < endY; j++)
+                for (int j = startY; j <= endY; j++)
                 {
                     if (j < 0 || j >= 15) continue;
                     if (i == x && j == y) continue;
@@ -399,7 +399,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x < 15 - 1 && y< 15-1) && board[x + 1, y + 1] == role)
+                        if (empty == -1 && (x < 15 - 1 && y < 15 - 1) && board[x + 1, y + 1] == role)
                         {
                             empty = count;
                             continue;
@@ -433,7 +433,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x > 0 && y>0) && board[x - 1, y - 1] == role)
+                        if (empty == -1 && (x > 0 && y > 0) && board[x - 1, y - 1] == role)
                         {
                             empty = 0;  //注意这里是0，因为是从右往左走的
                             continue;
@@ -477,7 +477,7 @@ namespace backgammon
                     var t = board[x, y];
                     if (t == (int)AiConfig.player.empty)
                     {
-                        if (empty == -1 && (x < 15 - 1 && y >0) && board[x + 1, y - 1] == role)
+                        if (empty == -1 && (x < 15 - 1 && y > 0) && board[x + 1, y - 1] == role)
                         {
                             empty = count;
                             continue;
@@ -755,25 +755,29 @@ namespace backgammon
             if (AiConfig.starspread)
             {
                 var i = currentSteps.Count - 1;
-                while(i >= 0) {
-                  var p = currentSteps[i];
-                  if (reverseRole == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
-                    || reverseRole == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three) {
-                    defendPoints.Add(p);
-                    break;
-                  }
-                  i -= 2;
+                while (i >= 0)
+                {
+                    var p = currentSteps[i];
+                    if (reverseRole == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
+                      || reverseRole == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three)
+                    {
+                        defendPoints.Add(p);
+                        break;
+                    }
+                    i -= 2;
                 }
 
                 var j = currentSteps.Count - 2;
-                while(j >= 0) {
-                  var p = currentSteps[j];
-                  if (role == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
-                    || role == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three) {
-                    defendPoints.Add(p);
-                    break;
-                  }
-                  j -= 2;
+                while (j >= 0)
+                {
+                    var p = currentSteps[j];
+                    if (role == (int)AiConfig.player.com && p.scoreCom >= (int)AiConfig.score.three
+                      || role == (int)AiConfig.player.hum && p.scoreHum >= (int)AiConfig.score.three)
+                    {
+                        defendPoints.Add(p);
+                        break;
+                    }
+                    j -= 2;
                 }
                 if (attackPoints.Count != 0)
                 {
@@ -781,7 +785,7 @@ namespace backgammon
                 }
                 if (defendPoints.Count != 0)
                 {
-                    defendPoints.Add(currentSteps[0].role == reverseRole? currentSteps[0] : currentSteps[1]);
+                    defendPoints.Add(currentSteps[0].role == reverseRole ? currentSteps[0] : currentSteps[1]);
                 }
             }
             for (int i = 0; i < 15; i++)
@@ -829,7 +833,7 @@ namespace backgammon
                         if (AiConfig.starspread && starspread)
                         {
                             if (maxScore >= (int)AiConfig.score.four) { }
-                            else if(maxScore >= (int)AiConfig.score.block_four && starTo(currentSteps[currentSteps.Count -1], defendPoints)) {}
+                            else if (maxScore >= (int)AiConfig.score.block_four && starTo(currentSteps[currentSteps.Count - 1], defendPoints)) { }
                             //star 路径不是很准，所以考虑冲四防守对手最后一步的棋
                             else if (starTo(p, attackPoints) || starTo(p, defendPoints)) { }
                             else
@@ -933,7 +937,8 @@ namespace backgammon
             var result = new List<Point>();
             if (role == (int)AiConfig.player.com)
             {
-                result = comtwothrees.Union(humblockedfours).ToList<Point>();
+                result = result.Union(comtwothrees).ToList<Point>();
+                result = result.Union(humtwothrees).ToList<Point>();
                 result = result.Union(comblockedfours).ToList<Point>();
                 result = result.Union(humblockedfours).ToList<Point>();
                 result = result.Union(comthrees).ToList<Point>();
@@ -941,7 +946,8 @@ namespace backgammon
             }
             if (role == (int)AiConfig.player.hum)
             {
-                result = humtwothrees.Union(comtwothrees).ToList<Point>();
+                result = result.Union(humtwothrees).ToList<Point>();
+                result = result.Union(comtwothrees).ToList<Point>();
                 result = result.Union(humblockedfours).ToList<Point>();
                 result = result.Union(comblockedfours).ToList<Point>();
                 result = result.Union(humthrees).ToList<Point>();
@@ -963,11 +969,11 @@ namespace backgammon
             var twos = new List<Point>();
             if (role == (int)AiConfig.player.com)
             {
-                twos = comtwos.Union(humtwos).ToList<Point>();
+                comtwos.Union(humtwos).ToList<Point>().ForEach(i => twos.Add(i));
             }
             else
             {
-                twos = humtwos.Union(comtwos).ToList<Point>();
+                humtwos.Union(comtwos).ToList<Point>().ForEach(i => twos.Add(i));
             }
 
             twos.Sort((a, b) => { return b.score - a.score; });
