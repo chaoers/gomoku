@@ -21,6 +21,7 @@ namespace backgammon
         private Ai ai;
         private bool isAi = false;
         private bool isWinBool = true;
+        private bool isWaiting = false;
         public static MainWindow mainWindow;
         public bool color = true;
         // 1-黑 0-白
@@ -96,7 +97,7 @@ namespace backgammon
             Canvas.SetLeft(black, X-15);
             Canvas.SetTop(black, Y-15);
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("添加黑棋\n");
+            logText.AppendText("黑棋下子，位置为" + "[" + ((X-10)/40).ToString() + "," + ((Y - 10) / 40).ToString() + "]\n");
             return black;
         }
         private WhitePiece addWhite(int X, int Y)
@@ -106,7 +107,7 @@ namespace backgammon
             Canvas.SetLeft(white, X-15);
             Canvas.SetTop(white, Y-15);
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("添加白棋\n");
+            logText.AppendText("白棋下子，位置为" + "[" + ((X - 10) / 40).ToString() + "," + ((Y - 10) / 40).ToString() + "]\n");
             return white;
         }
 
@@ -180,11 +181,11 @@ namespace backgammon
             {
                 var down = ai.begin();
                 downPiece(down[0], down[1]);
-                logText.AppendText(down[0].ToString()+"   "+down[1].ToString());
             }
         }
         private void addButton()
         {
+            isWinBool = false;
             Button btn = new Button()
             {
                 Name = "startButton",
@@ -216,7 +217,7 @@ namespace backgammon
         private void pan_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if(e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570 
-                && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570 && isWinBool == false)
+                && e.GetPosition(pan).Y >=0 && e.GetPosition(pan).Y <= 570 && isWinBool == false && isWaiting == false)
             {
                 int[] position = mainboard.placePosition(e.GetPosition(pan).X, e.GetPosition(pan).Y);
                 if(position[0] != -1) 
@@ -256,6 +257,9 @@ namespace backgammon
                     logText.ScrollToEnd();
                 }
             });
+            if (!isWinBool)
+            {
+
             if (color)
             {
                 mainboard.pieceNum[X, Y] = 1;
@@ -304,12 +308,13 @@ namespace backgammon
                     color = true;
                     if (isAi)
                     {
-                        isWinBool = true;
+                        isWaiting = true;
                         var down = ai.turn(X, Y);
                         downPiece(down[0], down[1]);
-                        isWinBool = false;
+                        isWaiting = false;
                     }
                 }
+            }
             }
         }
 
