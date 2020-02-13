@@ -14,8 +14,7 @@ namespace backgammon
         private bool isAi = false;
         private bool isWinBool = true;
         private bool isWaiting = false;
-        public static MainWindow mainWindow;
-        public bool color = true;
+        private bool color = true;
         // 1-黑 0-白
         private static Board mainboard = new Board();
         public MainWindow()
