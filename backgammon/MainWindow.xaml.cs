@@ -72,6 +72,7 @@ namespace backgammon
             addButton();
             mainboard.clearPiece();
             isAi = false;
+            color = true;
         }
         private void singleplayer(object sender, RoutedEventArgs e)
         {
@@ -92,6 +93,7 @@ namespace backgammon
             addButton();
             mainboard.clearPiece();
             isAi = true;
+            color = true;
         }
 
         private BlackPiece addBlack(int X, int Y)
@@ -117,6 +119,7 @@ namespace backgammon
 
         private void startDraw()
         {
+            isWaiting = true;
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("开始构建棋盘\n");
             var storyboard = new Storyboard();
@@ -180,6 +183,7 @@ namespace backgammon
         {
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
             logText.AppendText("构建棋盘完成\n");
+            isWaiting = false;
             isWinBool = false;
             if (isAi)
             {
@@ -233,6 +237,13 @@ namespace backgammon
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
+            logText.Dispatcher.BeginInvoke((Action)delegate
+            {
+                // if (IsVerticalScrollBarAtBottom)
+                // {
+                logText.ScrollToEnd();
+                // }
+            });
             if (e.GetPosition(pan).X >= 0 && e.GetPosition(pan).X <= 570
                 && e.GetPosition(pan).Y >= 0 && e.GetPosition(pan).Y <= 570 && isWinBool == false)
             {
@@ -254,13 +265,6 @@ namespace backgammon
 
         private void downPiece(int X,int Y)
         {
-            logText.Dispatcher.BeginInvoke((Action)delegate
-            {
-                // if (IsVerticalScrollBarAtBottom)
-                // {
-                    logText.ScrollToEnd();
-                // }
-            });
             if (!isWinBool)
             {
 
