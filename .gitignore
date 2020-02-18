@@ -4,7 +4,7 @@
 
 /.vs/
 /.vscode/
-/backgammon/.vs/
-/backgammon/.vscode/
-/backgammon/bin/
-/backgammon/obj/
+/gomoku/.vs/
+/gomoku/.vscode/
+/gomoku/bin/
+/gomoku/obj/
