@@ -29,7 +29,7 @@ namespace backgammon
             logText.AppendText("GITHUB:https://github.com/chaoers/gomoku\n");
             logText.AppendText("If you like it,please give me a star!\n");
             logText.AppendText(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"));
-            logText.AppendText("初始化完成,默认模式为玩家对战模式\n");
+            logText.AppendText("初始化完成,默认模式为玩家对战模式,请点击构建棋盘开始游戏\n");
         }
 
         // public bool IsVerticalScrollBarAtBottom

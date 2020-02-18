@@ -546,11 +546,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\git\\github\\mine\\backgammon\\backgammon\\gomoku.csproj",
+      "projectUniqueName": "D:\\git\\github\\mine\\gomoku\\gomoku\\gomoku.csproj",
       "projectName": "gomoku",
-      "projectPath": "D:\\git\\github\\mine\\backgammon\\backgammon\\gomoku.csproj",
+      "projectPath": "D:\\git\\github\\mine\\gomoku\\gomoku\\gomoku.csproj",
       "packagesPath": "C:\\Users\\10946\\.nuget\\packages\\",
-      "outputPath": "D:\\git\\github\\mine\\backgammon\\backgammon\\obj\\",
+      "outputPath": "D:\\git\\github\\mine\\gomoku\\gomoku\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\10946\\AppData\\Roaming\\NuGet\\NuGet.Config",
